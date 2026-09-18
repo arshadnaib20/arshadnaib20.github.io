@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arshad Naib — Computer Science Student</title>
+<meta name="description" content="Arshad Naib — final-year Computer Science student at Xuzhou University of Technology, based in Xuzhou, China. Python, web development, trilingual in Bengali, English and Chinese.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232F6B5B'/%3E%3Ctext x='32' y='42' font-family='Georgia,serif' font-size='32' font-weight='700' fill='%23F7F5F0' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Sora:wght@400;600;700&family=Work+Sans:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --paper: #F7F5F0;
+    --paper-deep: #EFECE3;
+    --ink: #21313C;
+    --ink-soft: #43535D;
+    --muted: #64737B;
+    --accent: #2F6B5B;
+    --accent-strong: #24574A;
+    --accent-soft: #E6EEE9;
+    --line: #DCD7CB;
+    --gold: #B0803A;
+    --maxw: 860px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Work Sans", "Noto Sans SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { font-family: "Sora", "Noto Sans SC", "Microsoft YaHei", "Segoe UI", sans-serif; line-height: 1.2; }
+  a { color: var(--accent-strong); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:hover { color: var(--accent); }
+  :focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; border-radius: 4px; }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- nav ---------- */
+  header {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(247, 245, 240, 0.92);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .logo {
+    font-family: "Sora", sans-serif; font-weight: 700; font-size: 18px;
+    color: var(--ink); text-decoration: none; letter-spacing: 0.2px;
+  }
+  .logo em { font-style: normal; color: var(--accent); }
+  .nav-links { display: flex; gap: 26px; list-style: none; }
+  .nav-links a {
+    color: var(--ink-soft); text-decoration: none; font-size: 15px; font-weight: 500;
+    padding: 4px 0;
+  }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-toggle {
+    display: none; background: none; border: 1px solid var(--line); border-radius: 8px;
+    width: 40px; height: 40px; cursor: pointer; padding: 0;
+  }
+  .nav-toggle span { display: block; width: 18px; height: 2px; background: var(--ink); margin: 4px auto; }
+  @media (max-width: 640px) {
+    .nav-toggle { display: block; }
+    .nav-links {
+      position: absolute; top: 64px; left: 0; right: 0;
+      flex-direction: column; gap: 0; background: var(--paper);
+      border-bottom: 1px solid var(--line);
+      display: none;
+    }
+    .nav-links.open { display: flex; }
+    .nav-links a { display: block; padding: 14px 24px; border-top: 1px solid var(--line); }
+  }
+
+  /* ---------- hero ---------- */
+  .hero { padding-top: 88px; padding-bottom: 64px; }
+  .avatar {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 72px; height: 72px; border-radius: 50%;
+    background: var(--accent); color: var(--paper);
+    font-family: "Sora", sans-serif; font-size: 28px; font-weight: 700;
+    margin-bottom: 28px; user-select: none;
+  }
+  .hero h1 { font-size: clamp(34px, 5.5vw, 54px); font-weight: 700; letter-spacing: -0.5px; margin-bottom: 14px; }
+  .hero .role { font-size: 20px; color: var(--ink-soft); max-width: 620px; margin-bottom: 10px; }
+  .hero .langs { font-size: 17px; color: var(--accent-strong); font-weight: 500; margin-bottom: 26px; }
+  .hero .status {
+    display: inline-block; font-size: 15px; color: var(--ink-soft);
+    border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; margin-bottom: 32px;
+    background: var(--paper-deep);
+  }
+  .cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: 12px 22px; border-radius: 10px;
+    font-size: 16px; font-weight: 600; text-decoration: none;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+  }
+  .btn-primary { background: var(--accent); color: #F7F5F0; }
+  .btn-primary:hover { background: var(--accent-strong); color: #F7F5F0; }
+  .btn-ghost { border: 1px solid var(--ink); color: var(--ink); background: transparent; }
+  .btn-ghost:hover { background: var(--ink); color: var(--paper); }
+
+  /* ---------- sections ---------- */
+  section { padding: 56px 0; }
+  section h2 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  .sec-note { color: var(--muted); font-size: 15px; margin-bottom: 28px; }
+  .rule { height: 1px; background: var(--line); border: 0; margin: 0 auto; max-width: var(--maxw); }
+
+  .about p { max-width: 720px; margin-bottom: 16px; }
+  .about p:last-of-type { margin-bottom: 28px; }
+  .lang-list { display: grid; grid-template-columns: 130px 1fr; gap: 10px 20px; max-width: 560px; }
+  .lang-list dt { font-weight: 600; }
+  .lang-list dd { color: var(--ink-soft); }
+
+  .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 48px; max-width: 720px; }
+  .skill-item { padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .skill-item h3 { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+  .skill-item h3 .lvl {
+    font-family: "Work Sans", sans-serif; font-weight: 400; font-size: 13px;
+    color: var(--accent-strong); background: var(--accent-soft);
+    border-radius: 999px; padding: 2px 10px; margin-left: 8px; vertical-align: 2px;
+  }
+  .skill-item p { font-size: 15px; color: var(--muted); }
+  @media (max-width: 640px) { .skills-grid { grid-template-columns: 1fr; } }
+
+  .project-row {
+    border: 1px solid var(--line); border-left: 4px solid var(--accent);
+    border-radius: 10px; padding: 22px 24px; margin-bottom: 18px;
+    background: var(--paper);
+  }
+  .project-row h3 { font-size: 19px; font-weight: 600; margin-bottom: 6px; }
+  .project-row p { font-size: 16px; color: var(--ink-soft); margin-bottom: 10px; max-width: 660px; }
+  .project-row .meta { font-size: 14px; color: var(--muted); }
+  .project-row .meta .tag {
+    display: inline-block; color: var(--accent-strong); font-weight: 600;
+  }
+  .more-note { font-size: 15px; color: var(--muted); }
+
+  .contact-links { display: grid; gap: 14px; max-width: 560px; margin-top: 8px; }
+  .contact-links a {
+    display: flex; align-items: baseline; gap: 12px;
+    color: var(--ink); text-decoration: none; font-size: 17px;
+    padding-bottom: 14px; border-bottom: 1px solid var(--line);
+  }
+  .contact-links a:hover { color: var(--accent); }
+  .contact-links .k { font-family: "Sora", sans-serif; font-size: 13px; font-weight: 600; color: var(--accent-strong); min-width: 64px; }
+  .contact-links .v { word-break: break-all; }
+  .where { margin-top: 26px; color: var(--muted); font-size: 15px; }
+
+  footer { border-top: 1px solid var(--line); padding: 30px 0 44px; text-align: center; color: var(--muted); font-size: 14px; }
+  footer .built { margin-top: 4px; font-size: 13px; }
+
+  @media (max-width: 640px) {
+    body { font-size: 16px; }
+    .hero { padding-top: 56px; padding-bottom: 40px; }
+    section { padding: 40px 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="#home">Arshad<em>.</em></a>
+    <nav aria-label="Main navigation">
+      <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- ===== hero ===== -->
+  <section class="hero wrap" id="home">
+    <div class="avatar" aria-hidden="true">AN</div>
+    <h1>Arshad Naib</h1>
+    <p class="role">Final-year Computer Science student at Xuzhou University of Technology, in China.</p>
+    <p class="langs">বাংলা · English · 中文</p>
+    <div>
+      <span class="status">Open to entry-level web development roles</span>
+    </div>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#projects">See my work</a>
+      <a class="btn btn-ghost" href="#contact">Contact me</a>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ===== about ===== -->
+  <section class="wrap about" id="about">
+    <h2>About</h2>
+    <p class="sec-note">Who I am and what I am working toward.</p>
+    <p>I am a final-year Computer Science student at Xuzhou University of Technology. I moved here from Bangladesh, and I have been studying in Chinese for the past few years — so three languages are part of my everyday life: my mother tongue Bengali, English, and Chinese.</p>
+    <p>Python is the language I know best, and I am also expert in HTML, CSS and JavaScript — the stack I use for frontend work. I have taken courses in Java, C and C++, and I keep building small projects to get better.</p>
+    <dl class="lang-list">
+      <dt>বাংলা</dt><dd>Native</dd>
+      <dt>English</dt><dd>Fluent</dd>
+      <dt>中文</dt><dd>Working level — my classes are in Chinese</dd>
+    </dl>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ===== skills ===== -->
+  <section class="wrap" id="skills">
+    <h2>Skills</h2>
+    <p class="sec-note">What I use, and how comfortable I am with it.</p>
+    <div class="skills-grid">
+      <div class="skill-item">
+        <h3>Python <span class="lvl">most comfortable</span></h3>
+        <p>Used in coursework and small tools; my main language.</p>
+      </div>
+      <div class="skill-item">
+        <h3>Java, C, C++ <span class="lvl">coursework</span></h3>
+        <p>Object-oriented and systems programming courses.</p>
+      </div>
+      <div class="skill-item">
+        <h3>HTML, CSS, JavaScript <span class="lvl">expert</span></h3>
+        <p>My main frontend stack — I build responsive pages and small apps with it.</p>
+      </div>
+      <div class="skill-item">
+        <h3>Git, GitHub, MySQL <span class="lvl">daily tools</span></h3>
+        <p>Version control and basics of databases.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ===== projects ===== -->
+  <section class="wrap" id="projects">
+    <h2>Projects</h2>
+    <p class="sec-note">Work in progress — I add entries as I finish them.</p>
+
+    <article class="project-row">
+      <h3>This portfolio website</h3>
+      <p>A personal site built with plain HTML, CSS and JavaScript, with no frameworks. Responsive on phones and desktops, hosted on GitHub Pages.</p>
+      <p class="meta"><span class="tag">Building now</span> · HTML · CSS · JavaScript</p>
+    </article>
+
+    <article class="project-row">
+      <h3>Flashcard app — Bangla · English · Chinese</h3>
+      <p>A small vocabulary trainer for the three languages I speak, built with Python (Flask) and a little JavaScript. My way of combining Python with web development.</p>
+      <p class="meta"><span class="tag">Planned, next up</span> · Python · Flask · SQLite</p>
+    </article>
+
+    <p class="more-note">More projects will land here as I finish them. My graduation project is also in progress.</p>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ===== contact ===== -->
+  <section class="wrap" id="contact">
+    <h2>Contact</h2>
+    <p class="sec-note">The fastest way to reach me is by email.</p>
+    <div class="contact-links">
+      <a href="mailto:arshadnaib20@gmail.com">
+        <span class="k">Email</span><span class="v">arshadnaib20@gmail.com</span>
+      </a>
+      <a href="https://github.com/arshadnaib20" target="_blank" rel="noopener">
+        <span class="k">GitHub</span><span class="v">github.com/arshadnaib20</span>
+      </a>
+      <a href="https://www.linkedin.com/in/abu-arshad-naib-402b0020a" target="_blank" rel="noopener">
+        <span class="k">LinkedIn</span><span class="v">linkedin.com/in/abu-arshad-naib-402b0020a</span>
+      </a>
+    </div>
+    <p class="where">Based in Xuzhou, Jiangsu, China.</p>
+  </section>
+</main>
+
+<footer>
+  <div>© <span id="year">2026</span> Arshad Naib</div>
+  <div class="built">Built with HTML, CSS and JavaScript.</div>
+</footer>
+
+<script>
+  var navToggle = document.getElementById("navToggle");
+  var navLinks = document.getElementById("navLinks");
+
+  navToggle.addEventListener("click", function () {
+    var open = navLinks.classList.toggle("open");
+    navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+
+  navLinks.addEventListener("click", function (e) {
+    if (e.target.tagName === "A") {
+      navLinks.classList.remove("open");
+      navToggle.setAttribute("aria-expanded", "false");
+    }
+  });
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
