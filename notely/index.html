@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notely — a quiet place to think</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231C3A32'/%3E%3Ctext x='32' y='43' font-family='Georgia,serif' font-size='30' font-style='italic' fill='%23F4EFE6' text-anchor='middle'%3EN%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&display=swap">
+<style>
+:root {
+  --paper: #F6F2EA; --paper-2: #EFE9DC; --card: #FCFAF5;
+  --ink: #1B2420; --ink-soft: #4A554F; --muted: #8A8F87;
+  --line: #E2DACA; --accent: #1C3A32; --accent-soft: #E3EAE4;
+  --danger: #9C3B3B;
+  --shadow: 0 1px 2px rgba(27,36,32,.04), 0 8px 24px rgba(27,36,32,.06);
+}
+[data-theme="dark"] {
+  --paper: #141816; --paper-2: #1B211E; --card: #1E2421;
+  --ink: #ECE7DB; --ink-soft: #B6B8AE; --muted: #7C827B;
+  --line: #2C3430; --accent: #9DB8AB; --accent-soft: #233029;
+  --danger: #D08080;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body, .app { height: 100%; }
+body { font-family: "Inter", sans-serif; background: var(--paper); color: var(--ink); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+.app { display: grid; grid-template-columns: 320px 1fr; }
+.sidebar { background: var(--paper-2); border-right: 1px solid var(--line); padding: 22px 18px; display: flex; flex-direction: column; gap: 16px; height: 100vh; position: sticky; top: 0; overflow-y: auto; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-mark { width: 34px; height: 34px; border-radius: 9px; background: var(--accent); color: var(--paper); font-family: "Fraunces", serif; font-style: italic; font-size: 20px; display: grid; place-items: center; }
+.brand-name { font-family: "Fraunces", serif; font-size: 22px; font-weight: 600; flex: 1; }
+.icon-btn { background: none; border: 1px solid var(--line); border-radius: 8px; width: 34px; height: 34px; cursor: pointer; color: var(--ink-soft); font-size: 16px; }
+.icon-btn:hover { background: var(--card); }
+.new-btn { background: var(--accent); color: var(--paper); border: none; border-radius: 10px; padding: 11px; font-size: 15px; font-weight: 500; cursor: pointer; font-family: inherit; }
+.new-btn:hover { opacity: .9; }
+.search-wrap input { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--ink); font-family: inherit; font-size: 14px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag-chip { font-size: 12px; padding: 3px 10px; border-radius: 999px; cursor: pointer; background: transparent; border: 1px solid var(--line); color: var(--ink-soft); }
+.tag-chip.active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+.note-list { display: flex; flex-direction: column; gap: 6px; }
+.note-item { padding: 12px 14px; border-radius: 10px; cursor: pointer; border: 1px solid transparent; }
+.note-item:hover { background: var(--card); }
+.note-item.active { background: var(--card); border-color: var(--line); box-shadow: var(--shadow); }
+.note-item h4 { font-family: "Fraunces", serif; font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+.note-item p { font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.note-item .when { font-size: 11px; color: var(--muted); margin-top: 4px; }
+.pane { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+.empty-state { margin: auto; text-align: center; padding: 40px; }
+.empty-quote { font-family: "Fraunces", serif; font-size: 80px; color: var(--line); line-height: 1; }
+.empty-state h2 { font-family: "Fraunces", serif; font-size: 30px; font-weight: 500; margin: 8px 0; }
+.empty-state p { color: var(--muted); }
+.editor { display: flex; flex-direction: column; height: 100%; }
+.editor-head { display: flex; align-items: center; gap: 14px; padding: 20px 32px 14px; border-bottom: 1px solid var(--line); }
+.editor-head input { flex: 1; background: none; border: none; color: var(--ink); font-family: "Fraunces", serif; font-size: 26px; font-weight: 600; }
+.editor-head input:focus { outline: none; }
+.head-actions { display: flex; align-items: center; gap: 10px; }
+.meta { font-size: 12px; color: var(--muted); }
+.ghost-btn { background: none; border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; cursor: pointer; color: var(--ink-soft); font-family: inherit; font-size: 13px; }
+.ghost-btn:hover { background: var(--card); }
+.ghost-btn.danger { color: var(--danger); }
+.editor-body { flex: 1; display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; }
+#body { border: none; background: var(--paper); color: var(--ink); padding: 28px 36px; font-family: "Inter", sans-serif; font-size: 15px; line-height: 1.7; resize: none; }
+#body:focus { outline: none; }
+.preview { padding: 28px 36px; overflow-y: auto; border-left: 1px solid var(--line); }
+.markdown { max-width: 640px; }
+.markdown h1, .markdown h2, .markdown h3 { font-family: "Fraunces", serif; margin: 18px 0 8px; }
+.markdown h1 { font-size: 28px; } .markdown h2 { font-size: 22px; } .markdown h3 { font-size: 18px; }
+.markdown p { margin: 8px 0; color: var(--ink-soft); }
+.markdown ul, .markdown ol { margin: 8px 0 8px 22px; color: var(--ink-soft); }
+.markdown code { background: var(--paper-2); padding: 2px 6px; border-radius: 5px; font-size: 13px; }
+.markdown a { color: var(--accent); }
+.hidden { display: none !important; }
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar { position: relative; height: auto; max-height: 40vh; }
+  .editor-body { grid-template-columns: 1fr; }
+  .preview { border-left: none; border-top: 1px solid var(--line); }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">N</span>
+      <span class="brand-name">Notely</span>
+      <button class="icon-btn" id="themeToggle" title="Toggle theme">◐</button>
+    </div>
+    <button class="new-btn" id="newBtn">+ New note</button>
+    <div class="search-wrap"><input type="search" id="search" placeholder="Search notes…" autocomplete="off"></div>
+    <div class="tags" id="tagList"></div>
+    <div class="note-list" id="noteList"></div>
+  </aside>
+  <main class="pane">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-quote">“</div>
+      <h2>A quiet place to write.</h2>
+      <p>Select a note, or create a new one.</p>
+    </div>
+    <div class="editor hidden" id="editor">
+      <div class="editor-head">
+        <input type="text" id="title" placeholder="Untitled" spellcheck="false">
+        <div class="head-actions">
+          <span class="meta" id="meta"></span>
+          <button class="ghost-btn danger" id="deleteBtn">Delete</button>
+        </div>
+      </div>
+      <div class="editor-body">
+        <textarea id="body" placeholder="Start writing in Markdown…" spellcheck="false"></textarea>
+        <div class="preview"><div class="markdown" id="md"></div></div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script>
+const $ = (s) => document.querySelector(s);
+let notes = JSON.parse(localStorage.getItem("notely") || "null");
+if (!notes) {
+  const now = new Date().toISOString();
+  notes = [
+    { id: 1, title: "Welcome to Notely", body: "# Welcome\n\nNotely is a quiet, distraction-free note.\n\n- Press **New note** to start writing\n- Type in **Markdown** and see the preview on the right\n- Use `#tags` anywhere to file it", updated_at: now },
+    { id: 2, title: "A few things to try", body: "## Try this\n\n1. Search in the box above\n2. Click a tag to filter\n3. Toggle the theme icon\n\nNotes autosave locally in your browser. #tips", updated_at: now },
+  ];
+  localStorage.setItem("notely", JSON.stringify(notes));
+}
+let currentId = notes[0] ? notes[0].id : null;
+let activeTag = "", searchQ = "", saveTimer = null;
+
+function save() { localStorage.setItem("notely", JSON.stringify(notes)); }
+function esc(s) { return (s||"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function fmt(iso) { const d = new Date(iso); return d.toLocaleDateString(undefined,{month:"short",day:"numeric"})+", "+d.toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit"}); }
+function tagsOf(n) { return [...new Set((n.body.match(/#(\w+)/g)||[]).map(t=>t.slice(1)))]; }
+
+function refresh() {
+  let list = [...notes].sort((a,b)=> b.updated_at.localeCompare(a.updated_at));
+  if (searchQ) { const q=searchQ.toLowerCase(); list = list.filter(n => (n.title+n.body).toLowerCase().includes(q)); }
+  if (activeTag) list = list.filter(n => tagsOf(n).includes(activeTag));
+  $("#noteList").innerHTML = list.length ? list.map(n => `
+    <div class="note-item ${n.id===currentId?'active':''}" data-id="${n.id}">
+      <h4>${esc(n.title||"Untitled")}</h4>
+      <p>${esc(n.body.replace(/[#*`]/g,"").slice(0,80))}</p>
+      <div class="when">${fmt(n.updated_at)}</div>
+    </div>`).join("") : `<p style="color:var(--muted);padding:10px;font-size:13px;">No notes found.</p>`;
+  document.querySelectorAll(".note-item").forEach(el => el.onclick = () => openNote(+el.dataset.id));
+  const counts = {}; notes.forEach(n => tagsOf(n).forEach(t => counts[t]=(counts[t]||0)+1));
+  $("#tagList").innerHTML = `<span class="tag-chip ${!activeTag?'active':''}" data-tag="">all</span>` +
+    Object.keys(counts).sort().map(t => `<span class="tag-chip ${activeTag===t?'active':''}" data-tag="${t}">#${t} · ${counts[t]}</span>`).join("");
+  document.querySelectorAll(".tag-chip").forEach(el => el.onclick = () => { activeTag = el.dataset.tag; refresh(); });
+}
+
+function openNote(id) {
+  const n = notes.find(x=>x.id===id); if(!n) return;
+  currentId = id;
+  $("#editor").classList.remove("hidden"); $("#emptyState").classList.add("hidden");
+  $("#title").value = n.title; $("#body").value = n.body;
+  $("#meta").textContent = "Edited " + fmt(n.updated_at);
+  render(); refresh();
+}
+function render() { $("#md").innerHTML = marked.parse($("#body").value || ""); }
+function scheduleSave() { clearTimeout(saveTimer); saveTimer = setTimeout(() => {
+  const n = notes.find(x=>x.id===currentId); if(!n) return;
+  n.title = $("#title").value; n.body = $("#body").value; n.updated_at = new Date().toISOString();
+  save(); $("#meta").textContent = "Saved just now"; refresh();
+}, 600); }
+
+$("#newBtn").onclick = () => {
+  const id = Math.max(0, ...notes.map(n=>n.id)) + 1;
+  notes.push({ id, title:"", body:"", updated_at:new Date().toISOString() });
+  save(); openNote(id); $("#title").focus();
+};
+$("#deleteBtn").onclick = () => {
+  if(!confirm("Delete this note?")) return;
+  notes = notes.filter(n=>n.id!==currentId); save();
+  currentId = notes[0]?notes[0].id:null;
+  $("#editor").classList.add("hidden"); $("#emptyState").classList.remove("hidden"); refresh();
+};
+$("#title").oninput = scheduleSave;
+$("#body").oninput = () => { render(); scheduleSave(); };
+$("#search").oninput = e => { searchQ = e.target.value; refresh(); };
+$("#themeToggle").onclick = () => {
+  const cur = document.documentElement.dataset.theme === "dark" ? "" : "dark";
+  document.documentElement.dataset.theme = cur; localStorage.setItem("notely-theme", cur);
+};
+if (localStorage.getItem("notely-theme") === "dark") document.documentElement.dataset.theme = "dark";
+marked.setOptions({ gfm:true, breaks:true });
+if (currentId != null) openNote(currentId); else refresh();
+</script>
+</body>
+</html>
