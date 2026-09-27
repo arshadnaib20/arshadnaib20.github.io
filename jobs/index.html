@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TalentBoard — find your next role</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230F3B33'/%3E%3Ctext x='32' y='43' font-family='Georgia,serif' font-size='28' font-weight='700' fill='%23E8C97A' text-anchor='middle'%3ET%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --bg: #F5F2EB; --ink: #0F3B33; --ink-soft: #34524B; --muted: #6E8179;
+  --line: #D8D2C2; --card: #FFFFFF; --accent: #0F3B33; --gold: #C9A24B;
+  --gold-soft: #F0E6CC; --green: #1F7A5C;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Inter", sans-serif; background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; line-height: 1.6; }
+.wrap { max-width: 1140px; margin: 0 auto; padding: 0 22px; }
+
+header { background: var(--ink); color: #F5F2EB; padding: 14px 0; position: sticky; top: 0; z-index: 50; }
+.nav { display: flex; justify-content: space-between; align-items: center; }
+.logo { font-family: "Fraunces", serif; font-size: 20px; font-weight: 700; }
+.logo span { color: #E8C97A; }
+.nav-right { font-size: 13px; color: rgba(245,242,235,.7); }
+
+.hero { padding: 56px 0 30px; text-align: center; }
+.hero h1 { font-family: "Fraunces", serif; font-size: clamp(30px,5vw,50px); margin-bottom: 10px; }
+.hero p { color: var(--ink-soft); max-width: 560px; margin: 0 auto 26px; }
+
+.searchbar { display: flex; gap: 8px; max-width: 720px; margin: 0 auto; background: #fff; padding: 6px; border-radius: 12px; box-shadow: 0 8px 24px rgba(15,59,51,.12); }
+.searchbar input { flex: 1; border: none; padding: 12px 14px; font-family: inherit; font-size: 15px; outline: none; }
+.searchbar button { background: var(--gold); border: none; padding: 12px 22px; border-radius: 9px; font-weight: 700; cursor: pointer; font-family: inherit; color: #0F3B33; }
+
+.filters { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 18px 0 28px; }
+.chip-f { font-size: 13px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line); background: #fff; cursor: pointer; font-family: inherit; }
+.chip-f.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+.ai-box { max-width: 720px; margin: 0 auto 36px; background: #fff; border: 1px dashed var(--gold); border-radius: 14px; padding: 18px 20px; }
+.ai-box h3 { font-family: "Fraunces", serif; font-size: 17px; margin-bottom: 6px; }
+.ai-box p { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+.ai-row { display: flex; gap: 8px; }
+.ai-row input { flex: 1; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-family: inherit; font-size: 14px; }
+.ai-row button { background: var(--ink); color: #E8C97A; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-family: inherit; font-weight: 600; }
+.ai-recs { margin-top: 10px; font-size: 13px; color: var(--ink-soft); }
+
+.jobs { display: grid; gap: 14px; padding-bottom: 60px; }
+.job { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; display: grid; grid-template-columns: 1fr auto; gap: 14px; cursor: pointer; transition: border-color .15s; }
+.job:hover { border-color: var(--gold); }
+.job h3 { font-size: 17px; margin-bottom: 3px; }
+.job .co { color: var(--muted); font-size: 14px; }
+.job .meta { font-size: 12.5px; color: var(--ink-soft); margin-top: 6px; }
+.badge { display: inline-block; font-size: 11px; background: var(--gold-soft); color: #7A5E1F; padding: 2px 9px; border-radius: 999px; margin-left: 6px; }
+.sal { font-family: "Fraunces", serif; color: var(--green); font-weight: 600; }
+
+.modal { position: fixed; inset: 0; background: rgba(15,59,51,.5); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 100; }
+.modal.open { display: flex; }
+.modal-card { background: #fff; border-radius: 14px; max-width: 560px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 28px; }
+.modal-card h2 { font-family: "Fraunces", serif; font-size: 22px; margin-bottom: 4px; }
+.modal-card .co { color: var(--muted); margin-bottom: 14px; }
+.modal-card p { font-size: 14.5px; color: var(--ink-soft); margin-bottom: 10px; }
+.modal-card ul { margin: 0 0 14px 18px; font-size: 14.5px; color: var(--ink-soft); }
+.modal-card .close { margin-top: 10px; }
+.btn-apply { background: var(--gold); color: #0F3B33; border: none; padding: 12px 20px; border-radius: 9px; font-weight: 700; cursor: pointer; font-family: inherit; width: 100%; margin-top: 10px; }
+.field { margin: 10px 0; }
+.field label { display: block; font-size: 12px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
+.field input, .field textarea { width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 8px; font-family: inherit; font-size: 14px; }
+.success { background: #E6F2EC; color: #1F7A5C; padding: 12px; border-radius: 8px; margin-top: 12px; text-align: center; }
+
+footer { border-top: 1px solid var(--line); padding: 24px 0; text-align: center; color: var(--muted); font-size: 13px; }
+footer a { color: var(--ink); }
+@media (max-width: 640px) { .job { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="logo">Talent<span>Board</span></div>
+    <div class="nav-right">
+      <button class="chip-f" onclick="openAuth('login')" style="background:transparent;color:#F5F2EB;border-color:rgba(245,241,235,.3)">Login</button>
+      <button class="chip-f" onclick="openAuth('register')" style="background:#E8C97A;color:#0F3B33;border:none">Sign up</button>
+      <span id="userBadge" style="display:none"></span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <h1>Find your dream job</h1>
+    <p>Search curated roles, filter by location and work style, and apply in one click. Get AI-matched recommendations based on your skills.</p>
+    <div class="searchbar">
+      <input id="q" placeholder="Try “developer”, “Shanghai”, “remote”...">
+      <button onclick="render()">Search</button>
+    </div>
+    <div class="filters" id="filters">
+      <button class="chip-f active" data-f="all">All</button>
+      <button class="chip-f" data-f="Remote">Remote</button>
+      <button class="chip-f" data-f="Hybrid">Hybrid</button>
+      <button class="chip-f" data-f="On-site">On-site</button>
+      <button class="chip-f" data-f="Intern">Intern</button>
+      <button class="chip-f" data-f="Junior">Junior</button>
+    </div>
+
+    <div class="ai-box">
+      <h3>AI job matcher</h3>
+      <p>Tell us the skills you have, and we'll point you to roles that fit.</p>
+      <div class="ai-row">
+        <input id="skills" placeholder="e.g. Python, JavaScript, SQL">
+        <button onclick="matchJobs()">Match me</button>
+      </div>
+      <div class="ai-recs" id="recs"></div>
+    </div>
+  </section>
+
+  <div class="jobs" id="jobs"></div>
+</main>
+
+<div class="modal" id="modal">
+  <div class="modal-card">
+    <h2 id="m_title"></h2>
+    <div class="co" id="m_co"></div>
+    <p id="m_desc"></p>
+    <ul id="m_resp"></ul>
+    <div id="applyForm">
+      <div class="field"><label>Your name</label><input id="a_name"></div>
+      <div class="field"><label>Email</label><input id="a_email"></div>
+      <div class="field"><label>Short note (optional)</label><textarea id="a_note"></textarea></div>
+      <button class="btn-apply" onclick="apply()">Submit application</button>
+    </div>
+    <div class="success" id="a_done" style="display:none">Application sent. The recruiter will be in touch.</div>
+    <button class="btn-apply" style="background:transparent;color:var(--ink);border:1px solid var(--line)" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<div class="modal" id="authModal">
+  <div class="modal-card">
+    <h2 id="authTitle">Login</h2>
+    <p style="font-size:13px;color:var(--muted)">Demo — accounts are saved in your browser. The real Java backend lives on GitHub.</p>
+    <div class="field" id="nameField" style="display:none"><label>Full name</label><input id="auth_name"></div>
+    <div class="field"><label>Email</label><input id="auth_email"></div>
+    <div class="field"><label>Password</label><input id="auth_pass" type="password"></div>
+    <div class="success" id="authMsg" style="display:none"></div>
+    <button class="btn-apply" onclick="doAuth()">Submit</button>
+    <button class="btn-apply" style="background:transparent;color:var(--ink);border:1px solid var(--line)" onclick="closeAuth()">Close</button>
+  </div>
+</div>
+
+<footer>
+  TalentBoard is a demo project by <a href="https://github.com/arshadnaib20">Arshad Naib</a> ·
+  Need a CV first? <a href="https://arshadnaib20.github.io/resume/">Build one here</a>.
+</footer>
+
+<script>
+const JOBS = [
+  { id:1, t:"Junior Web Developer", c:"TechNova Solutions", loc:"Shanghai, China", type:"On-site", level:"Junior", salary:"¥12–18k / mo",
+    desc:"Build and maintain customer-facing web pages using HTML, CSS and JavaScript. Work with a small team on real products.",
+    resp:["Develop responsive web UIs","Fix bugs and improve performance","Collaborate with designers"], skills:["html","css","javascript"] },
+  { id:2, t:"Python Backend Intern", c:"DataStream", loc:"Beijing, China", type:"Hybrid", level:"Intern", salary:"¥200 / day",
+    desc:"Write APIs and small automation scripts with Python and Flask.",
+    resp:["Build REST endpoints","Write SQL queries","Test and document code"], skills:["python","flask","sql"] },
+  { id:3, t:"Frontend Developer", c:"Creative Studio", loc:"Remote", type:"Remote", level:"Junior", salary:"$800–1,400 / mo",
+    desc:"Turn designs into fast, accessible websites.",
+    resp:["Build responsive layouts","Use vanilla JS and CSS","Ship to production"], skills:["html","css","javascript","react"] },
+  { id:4, t:"Software Engineer, Entry", c:"CloudBase", loc:"Shenzhen, China", type:"On-site", level:"Junior", salary:"¥15–22k / mo",
+    desc:"Generalist engineering role — backend, tooling, and internal services.",
+    resp:["Build internal tools","Maintain APIs","Write tests"], skills:["python","java","sql","git"] },
+  { id:5, t:"Data Analyst Intern", c:"MarketLens", loc:"Remote", type:"Remote", level:"Intern", salary:"¥150 / day",
+    desc:"Turn raw spreadsheets into clear reports.",
+    resp:["Clean data in Excel/Pandas","Build dashboards","Summarize findings"], skills:["python","sql","excel"] },
+  { id:6, t:"JavaScript Developer", c:"AppWorks", loc:"Hangzhou, China", type:"Hybrid", level:"Junior", salary:"¥13–19k / mo",
+    desc:"Build interactive features for a SaaS product.",
+    resp:["Write modern JS","Integrate REST APIs","Pair with senior devs"], skills:["javascript","css","rest"] },
+  { id:7, t:"IT Support / Junior DevOps", c:"NorthStar", loc:"Xuzhou, China", type:"On-site", level:"Junior", salary:"¥8–12k / mo",
+    desc:"Keep internal systems running and automate small tasks.",
+    resp:["Linux troubleshooting","Write shell scripts","Monitor uptime"], skills:["linux","bash","python"] },
+  { id:8, t:"Mobile Web Intern", c:"BrightApps", loc:"Remote", type:"Remote", level:"Intern", salary:"$300 / mo",
+    desc:"Optimize mobile web experience.",
+    resp:["Responsive CSS","Performance tuning","Browser testing"], skills:["html","css","javascript"] },
+  { id:9, t:"SQL Developer", c:"FinCore", loc:"Shanghai, China", type:"On-site", level:"Junior", salary:"¥14–20k / mo",
+    desc:"Design queries and small databases for reporting.",
+    resp:["Write complex SQL","Design tables","Optimize queries"], skills:["sql","mysql","python"] },
+  { id:10, t:"Graduate Software Engineer", c:"PandaTech", loc:"Chengdu, China", type:"On-site", level:"Junior", salary:"¥16–24k / mo",
+    desc:"2027 graduate program — rotations across backend and frontend.",
+    resp:["Learn the codebase","Ship features","Mentored rotations"], skills:["python","java","javascript","git"] },
+];
+
+let activeFilter = "all";
+let activeJob = null;
+
+function render() {
+  const q = document.getElementById("q").value.toLowerCase();
+  const list = JOBS.filter(j => {
+    const matchQ = !q || (j.t+" "+j.c+" "+j.loc+" "+j.skills.join(" ")).toLowerCase().includes(q);
+    const matchF = activeFilter === "all" || j.type === activeFilter || j.level === activeFilter;
+    return matchQ && matchF;
+  });
+  document.getElementById("jobs").innerHTML = list.map(j => `
+    <div class="job" onclick="openJob(${j.id})">
+      <div>
+        <h3>${j.t}<span class="badge">${j.level}</span></h3>
+        <div class="co">${j.c} · ${j.loc} · ${j.type}</div>
+        <div class="meta">${j.resp[0]} · ${j.resp[1]}</div>
+      </div>
+      <div class="sal">${j.salary}</div>
+    </div>`).join("") || "<p style='text-align:center;color:var(--muted)'>No roles match. Try broadening your search.</p>";
+}
+
+function openJob(id) {
+  activeJob = JOBS.find(j => j.id === id);
+  document.getElementById("m_title").textContent = activeJob.t;
+  document.getElementById("m_co").textContent = activeJob.c + " · " + activeJob.loc;
+  document.getElementById("m_desc").textContent = activeJob.desc;
+  document.getElementById("m_resp").innerHTML = activeJob.resp.map(r => `<li>${r}</li>`).join("");
+  document.getElementById("applyForm").style.display = "block";
+  document.getElementById("a_done").style.display = "none";
+  document.getElementById("modal").classList.add("open");
+}
+function closeModal() { document.getElementById("modal").classList.remove("open"); }
+
+function apply() {
+  const name = document.getElementById("a_name").value;
+  const email = document.getElementById("a_email").value;
+  if (!name || !email) { alert("Please add your name and email."); return; }
+  const apps = JSON.parse(localStorage.getItem("tb_apps") || "[]");
+  apps.push({ job: activeJob.t, name, email, date: new Date().toISOString().slice(0,10) });
+  localStorage.setItem("tb_apps", JSON.stringify(apps));
+  document.getElementById("applyForm").style.display = "none";
+  document.getElementById("a_done").style.display = "block";
+}
+
+function matchJobs() {
+  const s = document.getElementById("skills").value.toLowerCase();
+  const skills = s.split(/[,\s]+/).filter(Boolean);
+  const scored = JOBS.map(j => ({ j, score: j.skills.filter(x => skills.some(s => x.includes(s) || s.includes(x))).length }));
+  scored.sort((a,b) => b.score - a.score);
+  const top = scored.filter(x => x.score > 0).slice(0,3);
+  document.getElementById("recs").innerHTML = top.length
+    ? "Best matches: " + top.map(x => `<b>${x.j.t}</b> (${x.j.c})`).join(" · ")
+    : "Add a few skills like python or javascript to get matches.";
+}
+
+document.querySelectorAll(".chip-f").forEach(c => c.onclick = () => {
+  document.querySelectorAll(".chip-f").forEach(x => x.classList.remove("active"));
+  c.classList.add("active");
+  activeFilter = c.dataset.f;
+  render();
+});
+document.getElementById("q").addEventListener("keydown", e => { if (e.key === "Enter") render(); });
+
+let authMode = "login";
+function openAuth(m) {
+  authMode = m;
+  document.getElementById("authTitle").textContent = m === "login" ? "Login" : "Create account";
+  document.getElementById("nameField").style.display = m === "register" ? "block" : "none";
+  document.getElementById("authMsg").style.display = "none";
+  document.getElementById("authModal").classList.add("open");
+}
+function closeAuth() { document.getElementById("authModal").classList.remove("open"); }
+function doAuth() {
+  const email = document.getElementById("auth_email").value;
+  const pass = document.getElementById("auth_pass").value;
+  if (!email || !pass) { alert("Fill email and password."); return; }
+  const users = JSON.parse(localStorage.getItem("tb_users") || "{}");
+  const msg = document.getElementById("authMsg");
+  if (authMode === "register") {
+    if (users[email]) { msg.textContent = "Email already taken."; msg.style.display = "block"; return; }
+    users[email] = { name: document.getElementById("auth_name").value || email.split("@")[0], pass };
+    localStorage.setItem("tb_users", JSON.stringify(users));
+    localStorage.setItem("tb_session", email);
+  } else {
+    if (!users[email] || users[email].pass !== pass) { msg.textContent = "Wrong email or password."; msg.style.display = "block"; return; }
+    localStorage.setItem("tb_session", email);
+  }
+  updateBadge(); closeAuth();
+}
+function updateBadge() {
+  const email = localStorage.getItem("tb_session");
+  const badge = document.getElementById("userBadge");
+  if (email) {
+    const users = JSON.parse(localStorage.getItem("tb_users") || "{}");
+    badge.style.display = "inline";
+    badge.innerHTML = "Hi, " + (users[email] ? users[email].name : email) +
+      ' <a href="#" onclick="logout()" style="color:#E8C97A">logout</a>';
+  } else badge.style.display = "none";
+}
+function logout() { localStorage.removeItem("tb_session"); updateBadge(); }
+updateBadge();
+
+render();
+</script>
+</body>
+</html>
