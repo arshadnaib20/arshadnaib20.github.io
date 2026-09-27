@@ -102,13 +102,28 @@ function doAuth() {
 
 function brain(q) {
   const s = q.toLowerCase();
-  if (s.includes("python")) return "Python is a readable, beginner-friendly language.\n\n- Variables: `x = 5`\n- Functions: `def greet(name): return f\"Hi {name}\"`\n- Libraries: Flask for web, pandas for data.";
-  if (s.includes("java")) return "Java is statically typed and runs on the JVM. Strongly typed, OOP-first, and Spring Boot is the main web framework.";
-  if (s.includes("sql") || s.includes("database")) return "SQL basics:\n`SELECT * FROM users WHERE age > 18;`\n\nMaster SELECT, INSERT, UPDATE, DELETE.";
-  if (s.includes("git")) return "Daily flow: `git add .` → `git commit -m \"msg\"` → `git push`. Commit small and often.";
-  if (s.includes("html") || s.includes("css") || s.includes("web")) return "HTML = structure, CSS = styling, JavaScript = behaviour. Build one page a day for a week.";
-  if (s.includes("hello")) return "Hello! I'm a CS study assistant. Ask me about Python, Java, web, SQL or Git.";
-  return "Good question. I'm a demo assistant built by Arshad Naib. Try asking about Python, Java, SQL, Git, or web development.";
+  if (s.includes("flask") || s.includes("web app") || s.includes("rest api")) {
+    return "Here's a working Flask starter:\n\n```python\nfrom flask import Flask, jsonify, request\napp = Flask(__name__)\njobs = [{'id':1,'title':'Junior Dev'}]\n\n@app.route('/api/jobs')\ndef list_jobs():\n    return jsonify(jobs)\n\n@app.route('/api/jobs', methods=['POST'])\ndef add_job():\n    jobs.append(request.json)\n    return jsonify({'ok': True}), 201\n\nif __name__ == '__main__':\n    app.run(debug=True)\n```\n\nRun: `pip install flask` then `python app.py`.";
+  }
+  if (s.includes("python") && (s.includes("script") || s.includes("todo") || s.includes("calculator") || s.includes("game"))) {
+    return "Working Python to-do:\n\n```python\ntodos = []\nwhile True:\n    cmd = input('add/list/done/quit: ')\n    if cmd == 'add':\n        todos.append(input('task: '))\n    elif cmd == 'list':\n        for i,t in enumerate(todos,1): print(i,t)\n    elif cmd == 'done':\n        todos.pop(int(input('number: '))-1)\n    elif cmd == 'quit':\n        break\n```";
+  }
+  if (s.includes("html") && (s.includes("page") || s.includes("website") || s.includes("form"))) {
+    return "Clean HTML starter:\n\n```html\n<!DOCTYPE html>\n<html>\n<head><style>body{font-family:sans-serif;max-width:700px;margin:40px auto}</style></head>\n<body>\n  <h1>My page</h1>\n  <input id='n' placeholder='Your name'>\n  <button onclick=\"alert('Hi '+n.value)\">Say hi</button>\n</body>\n</html>\n```";
+  }
+  if (s.includes("sql") && (s.includes("query") || s.includes("table") || s.includes("database"))) {
+    return "Book shop schema:\n\n```sql\nCREATE TABLE books (\n  id INTEGER PRIMARY KEY,\n  title TEXT,\n  price REAL\n);\nINSERT INTO books VALUES (1,'The Hobbit',12.99);\nSELECT title FROM books WHERE price < 15;\n```";
+  }
+  if (s.includes("java") && (s.includes("class") || s.includes("program") || s.includes("hello"))) {
+    return "Minimal Java:\n\n```java\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello World\");\n    }\n}\n```";
+  }
+  if (s.includes("git")) return "Daily flow:\n```\ngit init\ngit add .\ngit commit -m \"first commit\"\ngit push\n```";
+  if (s.includes("python")) return "Ask me: 'write a python to-do script' and I'll give you runnable code.";
+  if (s.includes("java")) return "Ask me: 'write a java program'.";
+  if (s.includes("sql") || s.includes("database")) return "Ask me: 'write a sql table'.";
+  if (s.includes("html") || s.includes("web")) return "Ask me: 'write an html page'.";
+  if (s.includes("hello")) return "Hello! Ask me to write code: 'write a flask app', 'write a python script', 'write an html page'.";
+  return "Try: 'write a flask app', 'write a python to-do', 'write an html page', or 'write a sql query'.";
 }
 
 function send() {
@@ -124,7 +139,11 @@ function addMsg(role, text) {
   const el = document.getElementById("chat");
   const d = document.createElement("div");
   d.className = "msg " + role;
-  d.innerHTML = (role === "bot" ? '<div class="role">AskAI</div>' : "") + "<div>" + text.replace(/`([^`]+)`/g, "<code>$1</code>") + "</div>";
+  let html = text
+    .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre style="background:#0A0A0A;padding:12px;border-radius:8px;overflow-x:auto;font-family:monospace;font-size:13px;line-height:1.5">$2</pre>')
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\n/g, "<br>");
+  d.innerHTML = (role === "bot" ? '<div class="role">AskAI</div>' : "") + "<div>" + html + "</div>";
   el.appendChild(d);
   el.scrollTop = el.scrollHeight;
 }
