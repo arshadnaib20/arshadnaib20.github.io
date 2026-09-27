@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AskAI — CS study assistant</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2310A37F'/%3E%3Ctext x='32' y='43' font-family='Georgia,serif' font-size='28' font-weight='700' fill='white' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Inter", sans-serif; background: #0F0F0F; color: #ECECEC; height: 100vh; display: flex; }
+.sidebar { width: 260px; background: #171717; padding: 14px; display: flex; flex-direction: column; }
+.brand { padding: 10px; font-weight: 700; margin-bottom: 14px; }
+.brand span { color: #10A37F; }
+.menu-item { padding: 10px; border-radius: 8px; cursor: pointer; color: #ccc; font-size: 14px; }
+.menu-item:hover { background: #2A2A2A; }
+.spacer { flex: 1; }
+.userbox { padding: 10px; font-size: 13px; color: #999; border-top: 1px solid #333; }
+.main { flex: 1; display: flex; flex-direction: column; }
+.topbar { padding: 14px 22px; border-bottom: 1px solid #2A2A2A; font-weight: 600; }
+.chat { flex: 1; overflow-y: auto; padding: 24px; max-width: 800px; width: 100%; margin: 0 auto; }
+.msg { margin-bottom: 18px; max-width: 80%; }
+.msg.user { margin-left: auto; background: #2A2A2A; padding: 12px 14px; border-radius: 12px; }
+.msg.bot { background: transparent; }
+.msg .role { font-size: 12px; color: #10A37F; margin-bottom: 4px; font-weight: 600; }
+.inputbar { padding: 14px; border-top: 1px solid #2A2A2A; }
+.inputwrap { max-width: 800px; margin: 0 auto; display: flex; gap: 10px; }
+.inputwrap input { flex: 1; padding: 13px 16px; border-radius: 12px; border: 1px solid #333; background: #1F1F1F; color: #eee; font-family: inherit; font-size: 15px; }
+.inputwrap button { background: #10A37F; border: none; padding: 0 22px; border-radius: 12px; color: #fff; font-weight: 600; cursor: pointer; }
+
+.auth { position: fixed; inset: 0; background: #0F0F0F; display: flex; align-items: center; justify-content: center; z-index: 100; }
+.auth-card { background: #171717; padding: 36px; border-radius: 14px; width: 360px; }
+.auth-card h2 { margin-bottom: 4px; }
+.auth-card p { color: #888; font-size: 13px; margin-bottom: 18px; }
+.auth-card .f { margin-bottom: 12px; }
+.auth-card label { display: block; font-size: 12px; color: #888; margin-bottom: 4px; }
+.auth-card input { width: 100%; padding: 10px; background: #0F0F0F; border: 1px solid #333; color: #eee; border-radius: 8px; font-family: inherit; }
+.auth-card button { width: 100%; margin-top: 8px; padding: 11px; background: #10A37F; border: none; border-radius: 8px; color: #fff; font-weight: 600; cursor: pointer; }
+.switch { text-align: center; font-size: 13px; color: #888; margin-top: 12px; cursor: pointer; }
+.switch:hover { color: #10A37F; }
+code { background: #2A2A2A; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
+</style>
+</head>
+<body>
+
+<div class="auth" id="authView">
+  <div class="auth-card">
+    <h2 id="authTitle">Welcome back</h2>
+    <p id="authSub">Login to continue your conversations.</p>
+    <div class="f" id="nameField" style="display:none"><label>Full name</label><input id="a_name"></div>
+    <div class="f" id="countryField" style="display:none"><label>Country</label><input id="a_country"></div>
+    <div class="f"><label>Email</label><input id="a_email"></div>
+    <div class="f"><label>Password</label><input id="a_pass" type="password"></div>
+    <button onclick="doAuth()">Continue</button>
+    <div class="switch" id="switchLink" onclick="toggleMode()">No account? Sign up</div>
+  </div>
+</div>
+
+<div class="sidebar">
+  <div class="brand">Ask<span>AI</span></div>
+  <div class="menu-item" onclick="newChat()">+ New chat</div>
+  <div class="spacer"></div>
+  <div class="userbox" id="userbox"></div>
+</div>
+
+<div class="main">
+  <div class="topbar">CS Study Assistant · by Arshad Naib</div>
+  <div class="chat" id="chat"></div>
+  <div class="inputbar">
+    <div class="inputwrap">
+      <input id="box" placeholder="Ask about Python, Java, web, SQL..." onkeydown="if(event.key==='Enter')send()">
+      <button onclick="send()">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let mode = "login";
+function toggleMode() {
+  mode = mode === "login" ? "register" : "login";
+  document.getElementById("authTitle").textContent = mode === "login" ? "Welcome back" : "Create account";
+  document.getElementById("authSub").textContent = mode === "login" ? "Login to continue." : "One minute to sign up.";
+  document.getElementById("nameField").style.display = mode === "register" ? "block" : "none";
+  document.getElementById("countryField").style.display = mode === "register" ? "block" : "none";
+  document.getElementById("switchLink").textContent = mode === "login" ? "No account? Sign up" : "Have an account? Login";
+}
+
+function doAuth() {
+  const email = document.getElementById("a_email").value;
+  const pass = document.getElementById("a_pass").value;
+  if (!email || !pass) return alert("Fill email and password.");
+  const users = JSON.parse(localStorage.getItem("askai_users") || "{}");
+  if (mode === "register") {
+    if (users[email]) return alert("Email already taken.");
+    users[email] = { name: document.getElementById("a_name").value, country: document.getElementById("a_country").value };
+    localStorage.setItem("askai_users", JSON.stringify(users));
+  } else if (!users[email]) return alert("No account found. Sign up first.");
+  localStorage.setItem("askai_session", email);
+  document.getElementById("authView").style.display = "none";
+  document.getElementById("userbox").textContent = users[email].name || email;
+}
+
+function brain(q) {
+  const s = q.toLowerCase();
+  if (s.includes("python")) return "Python is a readable, beginner-friendly language.\n\n- Variables: `x = 5`\n- Functions: `def greet(name): return f\"Hi {name}\"`\n- Libraries: Flask for web, pandas for data.";
+  if (s.includes("java")) return "Java is statically typed and runs on the JVM. Strongly typed, OOP-first, and Spring Boot is the main web framework.";
+  if (s.includes("sql") || s.includes("database")) return "SQL basics:\n`SELECT * FROM users WHERE age > 18;`\n\nMaster SELECT, INSERT, UPDATE, DELETE.";
+  if (s.includes("git")) return "Daily flow: `git add .` → `git commit -m \"msg\"` → `git push`. Commit small and often.";
+  if (s.includes("html") || s.includes("css") || s.includes("web")) return "HTML = structure, CSS = styling, JavaScript = behaviour. Build one page a day for a week.";
+  if (s.includes("hello")) return "Hello! I'm a CS study assistant. Ask me about Python, Java, web, SQL or Git.";
+  return "Good question. I'm a demo assistant built by Arshad Naib. Try asking about Python, Java, SQL, Git, or web development.";
+}
+
+function send() {
+  const box = document.getElementById("box");
+  const text = box.value.trim();
+  if (!text) return;
+  box.value = "";
+  addMsg("user", text);
+  setTimeout(() => addMsg("bot", brain(text)), 300);
+}
+
+function addMsg(role, text) {
+  const el = document.getElementById("chat");
+  const d = document.createElement("div");
+  d.className = "msg " + role;
+  d.innerHTML = (role === "bot" ? '<div class="role">AskAI</div>' : "") + "<div>" + text.replace(/`([^`]+)`/g, "<code>$1</code>") + "</div>";
+  el.appendChild(d);
+  el.scrollTop = el.scrollHeight;
+}
+
+function newChat() { document.getElementById("chat").innerHTML = ""; addMsg("bot", "Hi! Ask me anything about computer science."); }
+
+if (localStorage.getItem("askai_session")) {
+  document.getElementById("authView").style.display = "none";
+  const u = JSON.parse(localStorage.getItem("askai_users") || "{}");
+  const e = localStorage.getItem("askai_session");
+  document.getElementById("userbox").textContent = u[e] ? u[e].name : e;
+}
+newChat();
+</script>
+</body>
+</html>
