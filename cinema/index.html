@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BookMySeat — book cinema tickets</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23E8A33D'/%3E%3Ctext x='32' y='43' font-family='Georgia,serif' font-size='28' font-weight='700' fill='%230E0F13' text-anchor='middle'%3EB%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --bg: #0E0F13; --bg-2: #16181F; --card: #1D2029; --card-2: #252936;
+  --ink: #F2EFE8; --ink-soft: #A8ADBA; --muted: #6B7280;
+  --line: #2A2E3A; --accent: #E8A33D; --accent-strong: #C9862A;
+  --sold: #3A3F4D; --free: #2E3A4F; --selected: #E8A33D;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Inter", sans-serif; background: var(--bg); color: var(--ink); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 0 22px; }
+
+header { border-bottom: 1px solid var(--line); position: sticky; top: 0; background: rgba(14,15,19,.92); backdrop-filter: blur(8px); z-index: 50; }
+.nav { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.logo { font-family: "Fraunces", serif; font-size: 22px; font-weight: 700; color: var(--ink); text-decoration: none; }
+.logo span { color: var(--accent); }
+.nav-right { display: flex; gap: 18px; align-items: center; font-size: 14px; color: var(--ink-soft); }
+.nav-right a { color: var(--ink-soft); text-decoration: none; }
+.nav-right a:hover { color: var(--accent); }
+
+.hero { padding: 44px 0 28px; }
+.hero h1 { font-family: "Fraunces", serif; font-size: clamp(28px,4.5vw,44px); font-weight: 700; margin-bottom: 8px; }
+.hero p { color: var(--ink-soft); max-width: 560px; }
+
+.section-title { font-family: "Fraunces", serif; font-size: 22px; margin: 30px 0 16px; }
+
+.movies { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px; padding-bottom: 40px; }
+.movie { background: var(--card); border-radius: 14px; overflow: hidden; cursor: pointer; transition: transform .15s, border-color .15s; border: 1px solid transparent; }
+.movie:hover { transform: translateY(-3px); border-color: var(--accent); }
+.poster { height: 150px; display: grid; place-items: center; font-family: "Fraunces", serif; font-size: 26px; font-weight: 700; color: rgba(255,255,255,.9); text-align: center; padding: 16px; }
+.p1 { background: linear-gradient(135deg,#2B3A67,#1A1F3A); }
+.p2 { background: linear-gradient(135deg,#6B2D3C,#2A1520); }
+.p3 { background: linear-gradient(135deg,#1F4D3F,#0F2A23); }
+.p4 { background: linear-gradient(135deg,#4A3B6B,#221A33); }
+.movie-body { padding: 14px 16px 18px; }
+.movie-body h3 { font-size: 17px; margin-bottom: 4px; }
+.movie-meta { font-size: 13px; color: var(--muted); }
+.badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--card-2); color: var(--accent); margin-top: 8px; }
+
+/* booking modal / view */
+.view { display: none; padding-bottom: 50px; }
+.view.active { display: block; }
+
+.back { background: none; border: none; color: var(--accent); font-size: 14px; cursor: pointer; padding: 12px 0; font-family: inherit; }
+.back:hover { text-decoration: underline; }
+
+.showtimes { display: flex; gap: 10px; flex-wrap: wrap; margin: 14px 0 26px; }
+.showtime { background: var(--card); border: 1px solid var(--line); color: var(--ink); padding: 10px 16px; border-radius: 10px; cursor: pointer; font-family: inherit; font-size: 14px; }
+.showtime.active { background: var(--accent); color: #0E0F13; border-color: var(--accent); font-weight: 600; }
+
+.screen { background: linear-gradient(to bottom, var(--accent), transparent 85%); height: 6px; border-radius: 50%; margin: 10px auto 26px; max-width: 420px; opacity: .6; }
+.screen-label { text-align: center; font-size: 12px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+
+.seats { display: grid; grid-template-columns: repeat(10, 30px); gap: 8px; justify-content: center; margin-bottom: 20px; }
+.seat { width: 30px; height: 30px; border-radius: 7px 7px 3px 3px; background: var(--free); border: none; cursor: pointer; }
+.seat.sold { background: var(--sold); cursor: not-allowed; }
+.seat.selected { background: var(--selected); }
+.legend { display: flex; gap: 18px; justify-content: center; font-size: 13px; color: var(--ink-soft); margin-bottom: 26px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.dot { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
+
+.confirm-bar { position: sticky; bottom: 0; background: var(--bg-2); border-top: 1px solid var(--line); padding: 14px 0; display: flex; justify-content: space-between; align-items: center; }
+.price { font-family: "Fraunces", serif; font-size: 20px; }
+.buy { background: var(--accent); color: #0E0F13; border: none; padding: 12px 26px; border-radius: 10px; font-weight: 700; cursor: pointer; font-family: inherit; font-size: 15px; }
+.buy:disabled { opacity: .4; cursor: not-allowed; }
+
+.ticket { background: var(--card); border: 1px dashed var(--accent); border-radius: 14px; padding: 26px; max-width: 460px; margin: 30px auto; text-align: center; }
+.ticket h3 { font-family: "Fraunces", serif; font-size: 24px; color: var(--accent); margin-bottom: 10px; }
+.ticket p { color: var(--ink-soft); margin: 4px 0; }
+.ticket .code { font-family: monospace; font-size: 20px; letter-spacing: 2px; color: var(--ink); background: var(--card-2); padding: 8px; border-radius: 8px; margin: 14px 0; }
+
+footer { border-top: 1px solid var(--line); padding: 24px 0; text-align: center; color: var(--muted); font-size: 13px; }
+@media (max-width: 600px) { .seats { grid-template-columns: repeat(8, 30px); } }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="#">Book<span>My</span>Seat</a>
+    <div class="nav-right"><a href="#">Now showing</a><a href="#">Halls</a></div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- movie list view -->
+  <section class="view active" id="movieView">
+    <div class="hero">
+      <h1>Now showing</h1>
+      <p>Pick a film, choose a hall and time, reserve your seats. Every hall in one place.</p>
+    </div>
+    <h2 class="section-title">Films & halls</h2>
+    <div class="movies" id="movieGrid"></div>
+  </section>
+
+  <!-- booking view -->
+  <section class="view" id="bookView">
+    <button class="back" id="backBtn">&larr; All films</button>
+    <h2 class="section-title" id="bookTitle"></h2>
+    <p style="color:var(--ink-soft)" id="bookHall"></p>
+    <h3 style="margin-top:18px;font-size:15px;color:var(--ink-soft)">Showtimes today</h3>
+    <div class="showtimes" id="showtimes"></div>
+    <div class="screen-label">Screen</div>
+    <div class="screen"></div>
+    <div class="seats" id="seats"></div>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--free)"></i> Available</span>
+      <span><i class="dot" style="background:var(--selected)"></i> Selected</span>
+      <span><i class="dot" style="background:var(--sold)"></i> Taken</span>
+    </div>
+    <div class="confirm-bar">
+      <div class="price" id="price">$0.00</div>
+      <button class="buy" id="buyBtn" disabled>Reserve seats</button>
+    </div>
+  </section>
+
+  <!-- confirmation view -->
+  <section class="view" id="doneView">
+    <div class="ticket">
+      <h3>Booking confirmed</h3>
+      <p id="doneFilm"></p>
+      <p id="doneHall"></p>
+      <p id="doneSeats"></p>
+      <div class="code" id="doneCode"></div>
+      <p style="font-size:13px;color:var(--muted)">Show this code at the counter. Enjoy the film.</p>
+      <button class="buy" style="margin-top:16px" id="againBtn">Book another</button>
+    </div>
+  </section>
+
+</main>
+<footer>BookMySeat — a demo cinema booking interface. Built with plain HTML, CSS and JavaScript.</footer>
+
+<script>
+const FILMS = [
+  { id: 1, title: "The Last Horizon", hall: "Hall 1 · Dolby Atmos", genre: "Sci-Fi", rating: "PG-13", poster: "p1", times: ["13:30","16:00","19:30","22:00"] },
+  { id: 2, title: "Midnight in Dhaka", hall: "Hall 2 · Standard", genre: "Drama", rating: "U", poster: "p2", times: ["14:15","17:45","20:30"] },
+  { id: 3, title: "Greenline", hall: "Hall 3 · 4K", genre: "Adventure", rating: "U", poster: "p3", times: ["12:00","15:20","18:40"] },
+  { id: 4, title: "Neon Nights", hall: "Hall 4 · IMAX", genre: "Action", rating: "15", poster: "p4", times: ["13:00","16:30","19:00","21:45"] },
+];
+const PRICE = 6.5;
+const ROWS = 6, COLS = 10;
+let selected = new Set();
+let current = null;
+
+const $ = (s) => document.querySelector(s);
+
+function renderMovies() {
+  $("#movieGrid").innerHTML = FILMS.map(f => `
+    <div class="movie" data-id="${f.id}">
+      <div class="poster ${f.poster}">${f.title}</div>
+      <div class="movie-body">
+        <h3>${f.title}</h3>
+        <div class="movie-meta">${f.hall}</div>
+        <span class="badge">${f.genre} · ${f.rating}</span>
+      </div>
+    </div>`).join("");
+  document.querySelectorAll(".movie").forEach(m => m.onclick = () => openFilm(+m.dataset.id));
+}
+
+function soldSeats(filmId, time) {
+  // deterministic pseudo-random "taken" seats
+  const key = filmId + time;
+  const sold = new Set();
+  for (let i = 0; i < 12; i++) sold.add((key.charCodeAt(i%key.length)*7 + i*13) % (ROWS*COLS));
+  return sold;
+}
+
+function openFilm(id) {
+  current = FILMS.find(f => f.id === id);
+  selected = new Set();
+  $("#bookTitle").textContent = current.title;
+  $("#bookHall").textContent = current.hall;
+  $("#showtimes").innerHTML = current.times.map(t => `<button class="showtime" data-t="${t}">${t}</button>`).join("");
+  document.querySelectorAll(".showtime").forEach(s => s.onclick = () => {
+    document.querySelectorAll(".showtime").forEach(x => x.classList.remove("active"));
+    s.classList.add("active");
+    renderSeats(s.dataset.t);
+  });
+  switchView("bookView");
+}
+
+let soldNow = new Set();
+function renderSeats(time) {
+  soldNow = soldSeats(current.id, time);
+  const el = $("#seats");
+  el.innerHTML = "";
+  for (let i = 0; i < ROWS*COLS; i++) {
+    const b = document.createElement("button");
+    b.className = "seat" + (soldNow.has(i) ? " sold" : "");
+    if (!soldNow.has(i)) b.onclick = () => {
+      if (selected.has(i)) selected.delete(i); else selected.add(i);
+      document.querySelectorAll(".seat").forEach((s,j) => s.classList.toggle("selected", selected.has(j)));
+      updatePrice();
+    };
+    el.appendChild(b);
+  }
+  updatePrice();
+}
+
+function updatePrice() {
+  $("#price").textContent = "$" + (selected.size * PRICE).toFixed(2);
+  $("#buyBtn").disabled = selected.size === 0;
+}
+
+$("#buyBtn").onclick = () => {
+  const seats = [...selected].sort((a,b)=>a-b).map(i => "R" + (Math.floor(i/COLS)+1) + "S" + (i%COLS+1));
+  $("#doneFilm").textContent = current.title;
+  $("#doneHall").textContent = current.hall + " · " + document.querySelector(".showtime.active").dataset.t;
+  $("#doneSeats").textContent = "Seats: " + seats.join(", ");
+  $("#doneCode").textContent = "BM" + Math.random().toString(36).slice(2,8).toUpperCase();
+  switchView("doneView");
+};
+
+function switchView(v) {
+  document.querySelectorAll(".view").forEach(x => x.classList.remove("active"));
+  document.getElementById(v).classList.add("active");
+  window.scrollTo(0,0);
+}
+$("#backBtn").onclick = () => switchView("movieView");
+$("#againBtn").onclick = () => switchView("movieView");
+
+renderMovies();
+</script>
+</body>
+</html>
