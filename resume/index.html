@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resume Studio — build a job-winning CV</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231A2A44'/%3E%3Ctext x='32' y='43' font-family='Georgia,serif' font-size='28' font-weight='700' fill='%23E8C97A' text-anchor='middle'%3ER%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --bg: #F4F1EA; --ink: #1A2A44; --ink-soft: #3D4A63; --muted: #7A8299;
+  --line: #DDD7C9; --card: #FFFFFF; --accent: #1A2A44; --gold: #B08A3E;
+  --accent-soft: #EAE6D8; --shadow: 0 10px 30px rgba(26,42,68,.10);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Inter", sans-serif; background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; }
+
+header { background: var(--ink); color: #F4F1EA; padding: 14px 0; }
+.nav { display: flex; justify-content: space-between; align-items: center; max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+.logo { font-family: "Fraunces", serif; font-size: 20px; font-weight: 700; }
+.logo span { color: #E8C97A; }
+.nav-actions { display: flex; gap: 10px; }
+.btn { font-family: inherit; border: none; cursor: pointer; border-radius: 8px; padding: 9px 16px; font-size: 14px; font-weight: 600; }
+.btn-gold { background: #E8C97A; color: #1A2A44; }
+.btn-ghost { background: transparent; color: #F4F1EA; border: 1px solid rgba(244,241,234,.3); }
+
+.wrap { max-width: 1280px; margin: 0 auto; padding: 24px; display: grid; grid-template-columns: 420px 1fr; gap: 26px; }
+
+.panel h2 { font-family: "Fraunces", serif; font-size: 18px; margin: 18px 0 10px; color: var(--ink); }
+.panel h2:first-child { margin-top: 0; }
+.field { margin-bottom: 10px; }
+.field label { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
+.field input, .field textarea, .field select {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px;
+  font-family: inherit; font-size: 14px; background: var(--card); color: var(--ink);
+}
+.field textarea { min-height: 70px; resize: vertical; }
+.field input:focus, .field textarea:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.exp-block { border: 1px solid var(--line); border-radius: 10px; padding: 12px; margin-bottom: 10px; background: var(--card); }
+.exp-block textarea { min-height: 60px; }
+.mini { font-size: 12px; color: var(--accent); cursor: pointer; background: none; border: none; font-family: inherit; padding: 4px 0; }
+.mini:hover { text-decoration: underline; }
+.enhance { font-size: 12px; background: var(--ink); color: #E8C97A; border: none; border-radius: 6px; padding: 5px 10px; cursor: pointer; font-family: inherit; }
+
+.skill-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.chip { font-size: 12px; background: var(--accent-soft); color: var(--ink); padding: 4px 10px; border-radius: 999px; }
+.suggest { font-size: 12px; color: var(--gold); cursor: pointer; background: none; border: 1px dashed var(--gold); border-radius: 999px; padding: 3px 9px; }
+
+/* preview sheet */
+.sheet-wrap { position: sticky; top: 18px; }
+.sheet {
+  background: #fff; padding: 48px 52px; box-shadow: var(--shadow);
+  min-height: 900px; font-size: 13.5px; line-height: 1.55; color: #222;
+}
+.sheet h1 { font-family: "Fraunces", serif; font-size: 30px; color: var(--ink); }
+.sheet .contact { color: #555; font-size: 12.5px; margin: 6px 0 16px; }
+.sheet h3 { font-family: "Fraunces", serif; font-size: 14px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--gold); border-bottom: 1px solid #ccc; padding-bottom: 4px; margin: 18px 0 8px; }
+.sheet .job { margin-bottom: 10px; }
+.sheet .job b { font-size: 13.5px; }
+.sheet .job .meta { color: #666; font-size: 12px; }
+.sheet ul { margin: 4px 0 0 18px; }
+.sheet li { margin-bottom: 2px; }
+.sheet .tags { color: var(--ink-soft); }
+.brand-note { text-align: center; font-size: 11px; color: var(--muted); margin-top: 12px; }
+
+@media print {
+  header, .panel, .brand-note { display: none; }
+  .wrap { display: block; padding: 0; }
+  .sheet { box-shadow: none; min-height: auto; }
+}
+@media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } .sheet-wrap { position: static; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <div class="logo">Resume<span> Studio</span> · by Arshad Naib</div>
+    <div class="nav-actions">
+      <button class="btn btn-ghost" onclick="save()">Save draft</button>
+      <button class="btn btn-gold" onclick="window.print()">Download PDF</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- EDITOR -->
+  <div class="panel">
+    <h2>Personal</h2>
+    <div class="field"><label>Full name</label><input id="f_name" placeholder="Jane Doe"></div>
+    <div class="row2">
+      <div class="field"><label>Title / target role</label><input id="f_role" placeholder="Junior Web Developer"></div>
+      <div class="field"><label>Location</label><input id="f_loc" placeholder="City, Country"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Email</label><input id="f_email" placeholder="you@email.com"></div>
+      <div class="field"><label>Phone</label><input id="f_phone" placeholder="+86 ..."></div>
+    </div>
+    <div class="field"><label>Summary</label><textarea id="f_sum" placeholder="Two lines about you..."></textarea></div>
+
+    <h2>Experience</h2>
+    <div id="expList"></div>
+    <button class="mini" onclick="addExp()">+ Add experience</button>
+
+    <h2>Education</h2>
+    <div class="field"><label>Degree</label><input id="f_edu" placeholder="B.Sc. Computer Science"></div>
+    <div class="field"><label>School · year</label><input id="f_eduyear" placeholder="Xuzhou University of Technology · 2027"></div>
+
+    <h2>Skills</h2>
+    <div class="field"><label>Comma-separated</label><input id="f_skills" placeholder="Python, JavaScript, SQL"></div>
+    <div>
+      <span style="font-size:12px;color:var(--muted)">Suggest for this role:</span>
+      <div class="skill-chips" id="sugg"></div>
+    </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="sheet-wrap">
+    <div class="sheet" id="sheet"></div>
+    <div class="brand-note">Built with Resume Studio by Arshad Naib · data saved privately in your browser</div>
+  </div>
+
+</div>
+
+<script>
+const VERBS = ["Developed","Built","Designed","Implemented","Optimized","Launched","Automated","Improved","Collaborated","Delivered"];
+const SKILL_MAP = {
+  "web": ["HTML","CSS","JavaScript","React","Node.js","REST APIs","Git"],
+  "data": ["Python","SQL","Pandas","Excel","Data Cleaning","Visualization"],
+  "devops": ["Linux","Docker","CI/CD","Bash","Cloud","Monitoring"]
+};
+
+let exps = [ { title:"", org:"", years:"", bullets:"" } ];
+
+function $(id){ return document.getElementById(id); }
+
+function enhance(text) {
+  // On-device "AI": turn a weak line into a strong action-verb bullet.
+  const lower = text.toLowerCase().trim();
+  if (!lower) return text;
+  let verb = "Developed";
+  if (/data|report|analysis/.test(lower)) verb = "Analyzed";
+  else if (/design|ui|web page/.test(lower)) verb = "Designed";
+  else if (/build|make|created/.test(lower)) verb = "Built";
+  else if (/test|bug/.test(lower)) verb = "Tested";
+  let body = text.replace(/^(i |we |our team )?(built|made|created|designed|developed|did|worked on|helped with|responsible for|worked)\s*/i, "").trim();
+  if (!body) body = lower;
+  return verb.charAt(0).toUpperCase() + verb.slice(1) + " " + body.charAt(0).toLowerCase() + body.slice(1)
+    + (body.endsWith(".") ? "" : ".");
+}
+
+function renderExp() {
+  $("expList").innerHTML = exps.map((e,i) => `
+    <div class="exp-block">
+      <div class="row2">
+        <div class="field"><input placeholder="Role" data-i="${i}" data-k="title" value="${e.title}"></div>
+        <div class="field"><input placeholder="Company" data-i="${i}" data-k="org" value="${e.org}"></div>
+      </div>
+      <div class="field"><input placeholder="Years (2024–2025)" data-i="${i}" data-k="years" value="${e.years}"></div>
+      <div class="field"><textarea placeholder="What you did, one line per bullet" data-i="${i}" data-k="bullets">${e.bullets}</textarea></div>
+      <button class="enhance" onclick="enhanceExp(${i})">Enhance bullets with AI</button>
+    </div>`).join("");
+  document.querySelectorAll("#expList input, #expList textarea").forEach(el => {
+    el.oninput = () => { exps[el.dataset.i][el.dataset.k] = el.value; render(); };
+  });
+}
+
+function enhanceExp(i) {
+  const lines = exps[i].bullets.split("\n").map(l => l.trim()).filter(Boolean);
+  exps[i].bullets = lines.map(enhance).join("\n");
+  renderExp(); render();
+}
+
+function addExp() { exps.push({title:"",org:"",years:"",bullets:""}); renderExp(); }
+
+function render() {
+  const n = $("f_name").value || "Your Name";
+  const r = $("f_role").value || "Target Role";
+  const loc = $("f_loc").value;
+  const em = $("f_email").value;
+  const ph = $("f_phone").value;
+  const sum = $("f_sum").value;
+  const edu = $("f_edu").value;
+  const eduy = $("f_eduyear").value;
+  const skills = $("f_skills").value.split(",").map(s=>s.trim()).filter(Boolean);
+
+  let html = `<h1>${n}</h1><div class="contact"><b>${r}</b> · ${loc} · ${em} · ${ph}</div>`;
+  if (sum) html += `<h3>Summary</h3><p>${sum}</p>`;
+  if (edu || eduy) html += `<h3>Education</h3><div><b>${edu}</b><div class="meta">${eduy}</div></div>`;
+  const hasExp = exps.some(e=>e.title||e.bullets);
+  if (hasExp) {
+    html += `<h3>Experience</h3>`;
+    exps.filter(e=>e.title||e.bullets).forEach(e => {
+      const bullets = e.bullets.split("\n").map(l=>l.trim()).filter(Boolean);
+      html += `<div class="job"><b>${e.title}</b> · ${e.org}<div class="meta">${e.years}</div><ul>${bullets.map(b=>`<li>${b}</li>`).join("")}</ul></div>`;
+    });
+  }
+  if (skills.length) html += `<h3>Skills</h3><div class="tags">${skills.join(" · ")}</div>`;
+  $("sheet").innerHTML = html;
+}
+
+function save() {
+  const data = { exps, f_name:$("f_name").value, f_role:$("f_role").value, f_loc:$("f_loc").value,
+    f_email:$("f_email").value, f_phone:$("f_phone").value, f_sum:$("f_sum").value,
+    f_edu:$("f_edu").value, f_eduyear:$("f_eduyear").value, f_skills:$("f_skills").value };
+  localStorage.setItem("resume_draft", JSON.stringify(data));
+  alert("Draft saved in your browser.");
+}
+
+function load() {
+  const raw = localStorage.getItem("resume_draft");
+  if (!raw) return;
+  const d = JSON.parse(raw);
+  exps = d.exps || exps;
+  ["f_name","f_role","f_loc","f_email","f_phone","f_sum","f_edu","f_eduyear","f_skills"].forEach(k => $(k).value = d[k]||"");
+  renderExp();
+}
+
+// skill suggestions based on role keywords
+$("f_role").oninput = () => {
+  const r = $("f_role").value.toLowerCase();
+  let keys = [];
+  if (/web|frontend|back|full|software|developer|engineer/.test(r)) keys = SKILL_MAP.web;
+  if (/data|analyst|scientist/.test(r)) keys = SKILL_MAP.data;
+  if (/devops|sre|ops/.test(r)) keys = SKILL_MAP.devops;
+  $("sugg").innerHTML = keys.map(k => `<button class="suggest" onclick="addSkill('${k}')">+ ${k}</button>`).join("");
+};
+function addSkill(k) {
+  const cur = $("f_skills").value;
+  $("f_skills").value = cur ? cur.replace(/,\s*$/, "") + ", " + k : k;
+  render();
+}
+
+["f_name","f_role","f_loc","f_email","f_phone","f_sum","f_edu","f_eduyear","f_skills"].forEach(k => $(k).oninput = render);
+
+load();
+renderExp();
+render();
+</script>
+</body>
+</html>
