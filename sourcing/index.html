@@ -36,6 +36,9 @@ h2 { font-family: "Noto Serif SC", serif; font-size: 36px; margin-bottom: 16px; 
 .contact p { color: #B5AE9E; margin: 12px 0; }
 .contact a { color: #C9A961; text-decoration: none; }
 .cn { font-family: "Noto Serif SC", serif; color: #C9A961; font-size: 14px; margin-top: 8px; }
+.hero-inner { display: grid; grid-template-columns: 1fr 280px; gap: 40px; align-items: center; }
+.hero-photo { width: 280px; height: 280px; border-radius: 50%; object-fit: cover; border: 3px solid #C9A961; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+@media (max-width: 800px) { .hero-inner { grid-template-columns: 1fr; } .hero-photo { margin: 0 auto; } }
 </style>
 </head>
 <body>
@@ -48,6 +51,7 @@ h2 { font-family: "Noto Serif SC", serif; font-size: 36px; margin-bottom: 16px; 
     <a class="cta" href="#contact">WhatsApp / WeChat Me</a>
     <a class="cta ghost" href="#how">How it works</a>
   </div>
+  <img class="hero-photo" src="assets/arshad.png" alt="Arshad Naib">
 </div>
 
 <section>
