@@ -8,95 +8,223 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: "Inter", sans-serif; background: #0E0E0C; color: #EDE8DF; }
-header { padding: 30px 6vw; border-bottom: 1px solid #2A2620; background: #161410; display:flex; justify-content:space-between; align-items:center; }
-.brand { font-size: 26px; font-weight: 700; color: #C9A961; }
+header { padding: 24px 6vw; border-bottom: 1px solid #2A2620; background: #161410; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;}
+.brand { font-size: 24px; font-weight: 700; color: #C9A961; }
 .brand span { color: #EDE8DF; }
-header p { color: #999; margin-top: 6px; font-size: 14px; }
-.toolbar { padding: 20px 6vw; display: flex; gap: 12px; flex-wrap: wrap; position: sticky; top: 0; background: #0E0E0C; z-index: 10; border-bottom: 1px solid #2A2620; }
+.cart-btn { background:#C9A961; color:#0E0E0C; padding:10px 20px; border-radius:20px; border:none; font-weight:700; cursor:pointer; }
+.toolbar { padding: 16px 6vw; display: flex; gap: 12px; flex-wrap: wrap; position: sticky; top: 0; background: #0E0E0C; z-index: 10; border-bottom: 1px solid #2A2620; }
 .toolbar input { flex: 1; min-width: 200px; padding: 12px 16px; border-radius: 10px; border: 1px solid #333; background: #1C1A16; color: #fff; }
 .toolbar select { padding: 12px; border-radius: 10px; background: #1C1A16; color: #fff; border: 1px solid #333; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 18px; padding: 30px 6vw; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; padding: 30px 6vw; }
 .card { background: #161410; border: 1px solid #2A2620; border-radius: 14px; overflow: hidden; }
 .card .imgwrap { position: relative; aspect-ratio: 4/3; background: #0E0E0C; overflow: hidden; }
 .card img { width: 100%; height: 100%; object-fit: cover; }
-.card .wm { position: absolute; bottom: 8px; right: 8px; background: rgba(14,14,12,0.8); color: #C9A961; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 1px; }
+.card .wm { position: absolute; bottom: 6px; right: 6px; background: rgba(14,14,12,0.85); color: #C9A961; padding: 3px 7px; border-radius: 4px; font-size: 9px; font-weight: 700; letter-spacing: 1px; }
 .card .body { padding: 14px; }
 .card .cat { font-size: 11px; color: #C9A961; text-transform: uppercase; letter-spacing: 1px; }
 .card h3 { font-size: 14px; margin: 6px 0; }
 .price-row { display: flex; justify-content: space-between; align-items: baseline; margin: 8px 0; }
 .tk { font-size: 20px; color: #C9A961; font-weight: 700; }
-.usd { font-size: 12px; color: #888; }
 .moq { font-size: 12px; color: #888; }
-.banner { background: linear-gradient(135deg,#C9A961,#8B6914); color: #0E0E0C; padding: 12px 6vw; font-weight: 600; }
+.add { width:100%; padding:10px; background:#C9A961; color:#0E0E0C; border:none; border-radius:8px; font-weight:700; cursor:pointer; margin-top:8px; }
+.banner { background: linear-gradient(135deg,#C9A961,#8B6914); color: #0E0E0C; padding: 10px 6vw; font-weight: 600; font-size:14px; }
+/* cart drawer */
+#drawer { position:fixed; top:0; right:-420px; width:400px; max-width:100vw; height:100vh; background:#161410; border-left:1px solid #2A2620; z-index:200; transition:right .3s; padding:20px; overflow-y:auto; }
+#drawer.open { right:0; }
+#drawer h2 { color:#C9A961; margin-bottom:16px; }
+.citem { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #222; font-size:14px; }
+.total { margin-top:16px; font-size:16px; }
+.total div { padding:6px 0; }
+.checkout { width:100%; padding:14px; background:#C9A961; color:#0E0E0C; border:none; border-radius:10px; font-weight:700; cursor:pointer; margin-top:16px; }
+.close { background:none; border:none; color:#888; font-size:22px; cursor:pointer; float:right; }
 </style>
 </head>
 <body>
 <header>
   <div>
     <div class="brand">Zara<span>Sourcing</span></div>
-    <p>Factory prices, 25% margin included. 1 RMB = 20.5 BDT.</p>
+    <p style="color:#888;font-size:13px;margin-top:4px;">1 RMB = 20.5 BDT · Shipping ৳1200/kg</p>
   </div>
+  <button class="cart-btn" onclick="openCart()">Cart (<span id="cnt">0</span>)</button>
 </header>
-<div class="banner">All prices in BDT already include 25% commission. Shipping to Chittagong/Dhaka quoted separately.</div>
+<div class="banner">Prices include 25% commission. Shipping calculated at checkout — ৳1200 per kg to Bangladesh.</div>
 <div class="toolbar">
   <input id="search" placeholder="Search products...">
   <select id="catFilter"><option value="">All categories</option></select>
 </div>
 <div class="grid" id="grid"></div>
 
+<div id="drawer">
+  <button class="close" onclick="closeCart()">×</button>
+  <h2>Your Cart</h2>
+  <div id="citems"></div>
+  <div class="total" id="total"></div>
+  <button class="checkout" onclick="sendOrder()">Send Order on WhatsApp</button>
+</div>
+
 <script>
 const RAW = [
-["Wireless Earbuds TWS Pro","Electronics",18,50],["Bluetooth Speaker Mini","Electronics",12,100],["20000mAh Power Bank","Electronics",16,50],["Fast Charger 65W","Electronics",9,100],["USB-C Cable 1m","Electronics",1.2,500],["Phone Case iPhone 15","Electronics",0.8,500],["Tempered Glass Screen","Electronics",0.3,1000],["Smart Watch Series 9","Electronics",22,30],["Selfie Ring Light","Electronics",4,200],["Phone Tripod","Electronics",3.5,200],["Bluetooth Neckband","Electronics",7,100],["Car Phone Holder","Electronics",1.5,500],["Mini Fan Portable","Electronics",2.8,300],["LED Desk Lamp","Electronics",6,100],["Wireless Mouse","Electronics",3,200],["Mechanical Keyboard","Electronics",18,50],["Webcam 1080p","Electronics",9,100],["HDMI Cable 2m","Electronics",2.5,200],["Smart LED Bulb","Electronics",3,300],["FM Transmitter Car","Electronics",4,200],
-["Stainless Cookware Set","Home",28,30],["Non-stick Frying Pan","Home",6.5,100],["Electric Kettle 1.8L","Home",9,100],["Rice Cooker 1.5L","Home",12,50],["Vacuum Flask 500ml","Home",4,200],["Glass Water Bottle","Home",1.8,300],["Cutlery Set 24pc","Home",5,100],["Food Storage Set","Home",3.5,200],["Electric Blender","Home",14,50],["Hand Mixer","Home",5.5,100],["Knife Set 6pc","Home",8,100],["Digital Kitchen Scale","Home",3,200],["Baking Mat Silicone","Home",1.2,500],["Dish Drying Rack","Home",6,100],["LED Night Light","Home",1.5,500],
-["Hair Dryer Professional","Beauty",11,50],["Men's Trimmer","Beauty",5,100],["Electric Shaver","Beauty",7,100],["Makeup Brush Set","Beauty",2.5,300],["Cosmetic Bag","Beauty",1.8,300],["Hair Straightener","Beauty",8,100],["Facial Steamer","Beauty",10,50],["Nail Clipper Set","Beauty",1.5,500],["Hair Curler","Beauty",9,100],["Massage Gun","Beauty",14,50],
-["Men's Analog Watch","Fashion",6,100],["Women's Leather Bag","Fashion",11,50],["Sunglasses UV400","Fashion",2.5,200],["Men's Wallet PU","Fashion",3,200],["Watch Band Silicone","Fashion",0.9,500],["Baseball Cap","Fashion",2,300],["Leather Belt","Fashion",2.8,200],["Wedding Ring Silicone","Fashion",0.5,1000],["Ladies Scarf","Fashion",2.2,300],["Travel Backpack","Fashion",9,100],
-["Building Blocks 500pc","Toys",7,100],["RC Car","Toys",8,100],["Plush Teddy Bear","Toys",3.5,200],["Drawing Board Kids","Toys",2.5,200],["Baby Rattle Set","Toys",1.8,300],["Puzzle 100pc","Toys",2,300],["Water Gun","Toys",1.5,300],["Mini Drone","Toys",12,50],
-["Car Mount","Auto",1.5,500],["Car Charger USB","Auto",2,300],["Tire Inflator","Auto",11,50],["Car Seat Cover","Auto",14,50],["LED Interior Strip","Auto",2.5,200],["Jump Starter","Auto",22,30],["Car Wax Polish","Auto",3,200],["Dash Cam 1080p","Auto",16,50],
-["Yoga Mat 6mm","Sports",4,200],["Resistance Bands Set","Sports",2.5,300],["Jump Rope","Sports",1.2,500],["Dumbbell Set","Sports",18,30],["Water Bottle 1L","Sports",2,300],["Gym Gloves","Sports",2.8,200],["Foam Roller","Sports",3.5,200],["Running Belt","Sports",1.8,300],
+["Wireless Earbuds TWS Pro","Electronics",18,50,0.1,"https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400&q=80"],
+["Bluetooth Speaker Mini","Electronics",12,100,0.3,"https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400&q=80"],
+["20000mAh Power Bank","Electronics",16,50,0.35,"https://images.unsplash.com/photo-1609091839311-d5365f90f9c5?w=400&q=80"],
+["Fast Charger 65W","Electronics",9,100,0.1,"https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=400&q=80"],
+["USB-C Cable 1m","Electronics",1.2,500,0.03,"https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=400&q=80"],
+["Phone Case iPhone 15","Electronics",0.8,500,0.04,"https://images.unsplash.com/photo-1601593346007-d5b48e88b24e?w=400&q=80"],
+["Tempered Glass Screen","Electronics",0.3,1000,0.02,"https://images.unsplash.com/photo-1601593346007-d5b48e88b24e?w=400&q=80"],
+["Smart Watch Series 9","Electronics",22,30,0.1,"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80"],
+["Selfie Ring Light","Electronics",4,200,0.3,"https://images.unsplash.com/photo-1596480645454-0c0e181d3b8a?w=400&q=80"],
+["Phone Tripod","Electronics",3.5,200,0.2,"https://images.unsplash.com/photo-1606986628025-35d7a8f5e9c0?w=400&q=80"],
+["Bluetooth Neckband","Electronics",7,100,0.08,"https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400&q=80"],
+["Car Phone Holder","Electronics",1.5,500,0.05,"https://images.unsplash.com/photo-1502877338535-766e1452684a?w=400&q=80"],
+["Mini Fan Portable","Electronics",2.8,300,0.2,"https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=400&q=80"],
+["LED Desk Lamp","Electronics",6,100,0.5,"https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=400&q=80"],
+["Wireless Mouse","Electronics",3,200,0.08,"https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&q=80"],
+["Mechanical Keyboard","Electronics",18,50,0.8,"https://images.unsplash.com/photo-1587829741301-dc798b83ef30?w=400&q=80"],
+["Webcam 1080p","Electronics",9,100,0.15,"https://images.unsplash.com/photo-1610847611390-72ae8e0e7a3b?w=400&q=80"],
+["HDMI Cable 2m","Electronics",2.5,200,0.1,"https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=400&q=80"],
+["Smart LED Bulb","Electronics",3,300,0.05,"https://images.unsplash.com/photo-1550985616-10810253b84d?w=400&q=80"],
+["FM Transmitter Car","Electronics",4,200,0.05,"https://images.unsplash.com/photo-1502877338535-766e1452684a?w=400&q=80"],
+["Stainless Cookware Set","Home",28,30,3.0,"https://images.unsplash.com/photo-1584990347449-a6d09306d194?w=400&q=80"],
+["Non-stick Frying Pan","Home",6.5,100,0.5,"https://images.unsplash.com/photo-1590734018849-766e76a3e131?w=400&q=80"],
+["Electric Kettle 1.8L","Home",9,100,0.9,"https://images.unsplash.com/photo-1571175443880-49e1d25225f2?w=400&q=80"],
+["Rice Cooker 1.5L","Home",12,50,2.5,"https://images.unsplash.com/photo-1585515320310-259814833e21?w=400&q=80"],
+["Vacuum Flask 500ml","Home",4,200,0.3,"https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400&q=80"],
+["Glass Water Bottle","Home",1.8,300,0.4,"https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400&q=80"],
+["Cutlery Set 24pc","Home",5,100,0.8,"https://images.unsplash.com/photo-1584990347449-a6d09306d194?w=400&q=80"],
+["Food Storage Set","Home",3.5,200,0.6,"https://images.unsplash.com/photo-1584990347449-a6d09306d194?w=400&q=80"],
+["Electric Blender","Home",14,50,1.5,"https://images.unsplash.com/photo-1570222094114-d054a817e56b?w=400&q=80"],
+["Hand Mixer","Home",5.5,100,0.8,"https://images.unsplash.com/photo-1570222094114-d054a817e56b?w=400&q=80"],
+["Knife Set 6pc","Home",8,100,1.0,"https://images.unsplash.com/photo-1593618794953-509843c1ad96?w=400&q=80"],
+["Digital Kitchen Scale","Home",3,200,0.4,"https://images.unsplash.com/photo-1594791584109-e9a1f7a2f4a7?w=400&q=80"],
+["Baking Mat Silicone","Home",1.2,500,0.05,"https://images.unsplash.com/photo-1556909212-d536cd87e08c?w=400&q=80"],
+["Dish Drying Rack","Home",6,100,1.2,"https://images.unsplash.com/photo-1584990347449-a6d09306d194?w=400&q=80"],
+["LED Night Light","Home",1.5,500,0.05,"https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=400&q=80"],
+["Hair Dryer Professional","Beauty",11,50,0.6,"https://images.unsplash.com/photo-1522337660859-02fbefca4702?w=400&q=80"],
+["Men's Trimmer","Beauty",5,100,0.2,"https://images.unsplash.com/photo-1621607512214-68297480165e?w=400&q=80"],
+["Electric Shaver","Beauty",7,100,0.3,"https://images.unsplash.com/photo-1621607512214-68297480165e?w=400&q=80"],
+["Makeup Brush Set","Beauty",2.5,300,0.15,"https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&q=80"],
+["Cosmetic Bag","Beauty",1.8,300,0.2,"https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&q=80"],
+["Hair Straightener","Beauty",8,100,0.4,"https://images.unsplash.com/photo-1522337660859-02fbefca4702?w=400&q=80"],
+["Facial Steamer","Beauty",10,50,0.6,"https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400&q=80"],
+["Nail Clipper Set","Beauty",1.5,500,0.1,"https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&q=80"],
+["Hair Curler","Beauty",9,100,0.4,"https://images.unsplash.com/photo-1522337660859-02fbefca4702?w=400&q=80"],
+["Massage Gun","Beauty",14,50,0.7,"https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400&q=80"],
+["Men's Analog Watch","Fashion",6,100,0.1,"https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400&q=80"],
+["Women's Leather Bag","Fashion",11,50,0.6,"https://images.unsplash.com/photo-1548036999-cb9ee52b286b?w=400&q=80"],
+["Sunglasses UV400","Fashion",2.5,200,0.05,"https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&q=80"],
+["Men's Wallet PU","Fashion",3,200,0.1,"https://images.unsplash.com/photo-1627123424574-724758594e93?w=400&q=80"],
+["Watch Band Silicone","Fashion",0.9,500,0.03,"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80"],
+["Baseball Cap","Fashion",2,300,0.1,"https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=400&q=80"],
+["Leather Belt","Fashion",2.8,200,0.15,"https://images.unsplash.com/photo-1624222274708-709eaebc47ff?w=400&q=80"],
+["Wedding Ring Silicone","Fashion",0.5,1000,0.01,"https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&q=80"],
+["Ladies Scarf","Fashion",2.2,300,0.1,"https://images.unsplash.com/photo-1601924994987-69e26d50dc26?w=400&q=80"],
+["Travel Backpack","Fashion",9,100,0.8,"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=80"],
+["Building Blocks 500pc","Toys",7,100,0.8,"https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=400&q=80"],
+["RC Car","Toys",8,100,0.5,"https://images.unsplash.com/photo-1594787378021-7c8b1a7b6a8e?w=400&q=80"],
+["Plush Teddy Bear","Toys",3.5,200,0.3,"https://images.unsplash.com/photo-1530650377384-995736d3a5b7?w=400&q=80"],
+["Drawing Board Kids","Toys",2.5,200,0.3,"https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&q=80"],
+["Baby Rattle Set","Toys",1.8,300,0.2,"https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=400&q=80"],
+["Puzzle 100pc","Toys",2,300,0.2,"https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=400&q=80"],
+["Water Gun","Toys",1.5,300,0.2,"https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=400&q=80"],
+["Mini Drone","Toys",12,50,0.5,"https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=400&q=80"],
+["Car Mount","Auto",1.5,500,0.1,"https://images.unsplash.com/photo-1502877338535-766e1452684a?w=400&q=80"],
+["Car Charger USB","Auto",2,300,0.05,"https://images.unsplash.com/photo-1502877338535-766e1452684a?w=400&q=80"],
+["Tire Inflator","Auto",11,50,1.5,"https://images.unsplash.com/photo-1502877338535-766e1452684a?w=400&q=80"],
+["Car Seat Cover","Auto",14,50,2.0,"https://images.unsplash.com/photo-1502877338535-766e1452684a?w=400&q=80"],
+["LED Interior Strip","Auto",2.5,200,0.1,"https://images.unsplash.com/photo-1502877338535-766e1452684a?w=400&q=80"],
+["Jump Starter","Auto",22,30,3.5,"https://images.unsplash.com/photo-1502877338535-766e1452684a?w=400&q=80"],
+["Car Wax Polish","Auto",3,200,0.4,"https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?w=400&q=80"],
+["Dash Cam 1080p","Auto",16,50,0.2,"https://images.unsplash.com/photo-1502877338535-766e1452684a?w=400&q=80"],
+["Yoga Mat 6mm","Sports",4,200,1.2,"https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&q=80"],
+["Resistance Bands Set","Sports",2.5,300,0.3,"https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&q=80"],
+["Jump Rope","Sports",1.2,500,0.1,"https://images.unsplash.com/photo-1434596928276-175e410fc673?w=400&q=80"],
+["Dumbbell Set","Sports",18,30,8.0,"https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&q=80"],
+["Water Bottle 1L","Sports",2,300,0.5,"https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400&q=80"],
+["Gym Gloves","Sports",2.8,200,0.1,"https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&q=80"],
+["Foam Roller","Sports",3.5,200,0.8,"https://images.unsplash.com/photo-1616683958906-f7f7f3e1d6e9?w=400&q=80"],
+["Running Belt","Sports",1.8,300,0.1,"https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=400&q=80"],
 ];
 
-const RATE = 20.5; // 1 RMB = 20.5 BDT
+const RATE = 20.5;
+const SHIP_RATE = 1200; // BDT per kg
+let cart = JSON.parse(localStorage.getItem('cart')||'[]');
+
 const grid = document.getElementById('grid');
 const catFilter = document.getElementById('catFilter');
 const cats = [...new Set(RAW.map(p=>p[1]))];
 cats.forEach(c => { const o=document.createElement('option'); o.value=c; o.textContent=c; catFilter.appendChild(o); });
 
-const IMG = {
-"Electronics":"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&q=80",
-"Home":"https://images.unsplash.com/photo-1556909212-d536cd87e08c?w=400&q=80",
-"Beauty":"https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&q=80",
-"Fashion":"https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400&q=80",
-"Toys":"https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=400&q=80",
-"Auto":"https://images.unsplash.com/photo-1502877338535-766e1452684a?w=400&q=80",
-"Sports":"https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&q=80",
-};
+function save(){ localStorage.setItem('cart', JSON.stringify(cart)); document.getElementById('cnt').textContent = cart.reduce((a,b)=>a+b.qty,0); }
+
+function add(i){
+  const ex = cart.find(c=>c.i===i);
+  if(ex) ex.qty++; else cart.push({i, qty:1});
+  save();
+}
+
 function render() {
   const q = document.getElementById('search').value.toLowerCase();
   const cat = catFilter.value;
   grid.innerHTML = '';
   RAW.filter(p => (!cat || p[1]===cat) && (!q || p[0].toLowerCase().includes(q))).forEach((p,i) => {
-    const [name, c, rmb, moq] = p;
+    const [name, c, rmb, moq, wt, img] = p;
     const sellRmb = rmb * 1.25;
     const bdt = Math.round(sellRmb * RATE);
-    const usd = (sellRmb * 0.14).toFixed(2);
     const div = document.createElement('div');
     div.className = 'card';
     div.innerHTML = `<div class="imgwrap">
-      <img src="${IMG[c]}" alt="${name}" loading="lazy">
+      <img src="${img}" alt="${name}" loading="lazy">
       <div class="wm">ZARA SOURCING</div>
     </div>
     <div class="body">
       <div class="cat">${c}</div>
       <h3>${name}</h3>
-      <div class="price-row"><span class="tk">৳${bdt}</span><span class="usd">$${usd}</span></div>
+      <div class="price-row"><span class="tk">৳${bdt}</span><span style="color:#888;font-size:12px;">${wt} kg</span></div>
       <div class="moq">MOQ: ${moq} pcs</div>
+      <button class="add" onclick="add(${i})">Add to Cart</button>
     </div>`;
     grid.appendChild(div);
   });
 }
+
+function openCart(){
+  document.getElementById('drawer').classList.add('open');
+  renderCart();
+}
+function closeCart(){ document.getElementById('drawer').classList.remove('open'); }
+
+function renderCart(){
+  const el = document.getElementById('citems');
+  let items='', sub=0, wt=0;
+  cart.forEach(c => {
+    const p = RAW[c.i];
+    const line = Math.round(p[2]*1.25*RATE) * c.qty;
+    sub += line;
+    wt += p[4] * c.qty;
+    items += `<div class="citem"><span>${p[0]} × ${c.qty}</span><span>৳${line}</span></div>`;
+  });
+  const ship = Math.ceil(wt) * SHIP_RATE;
+  el.innerHTML = items || '<p style="color:#888">Cart is empty</p>';
+  document.getElementById('total').innerHTML = `
+    <div>Products: ৳${sub}</div>
+    <div>Weight: ${wt.toFixed(1)} kg</div>
+    <div>Shipping: ৳${ship}</div>
+    <div style="font-size:20px;color:#C9A961;font-weight:700;margin-top:8px;">Total: ৳${sub+ship}</div>`;
+  window._order = {sub, ship, total: sub+ship, items: cart.map(c=>({name:RAW[c.i][0], qty:c.qty, price:RAW[c.i][2]}))};
+}
+
+function sendOrder(){
+  if(!cart.length){ alert('Cart is empty'); return; }
+  const o = window._order;
+  let msg = "Hello Zara Sourcing! I'd like to order:\n";
+  o.items.forEach(it => { msg += `• ${it.name} × ${it.qty}\n`; });
+  msg += `\nProduct total: ৳${o.sub}\nShipping: ৳${o.ship}\nGrand total: ৳${o.total}`;
+  window.open('https://wa.me/8801727067920?text=' + encodeURIComponent(msg));
+}
+
 document.getElementById('search').addEventListener('input', render);
 catFilter.addEventListener('change', render);
-render();
+save(); render();
 </script>
 </body>
 </html>
