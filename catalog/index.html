@@ -223,6 +223,8 @@ function sendOrder(){
 
 document.getElementById('search').addEventListener('input', render);
 catFilter.addEventListener('change', render);
+const urlCat = new URLSearchParams(location.search).get('cat');
+if(urlCat){ catFilter.value = urlCat; }
 save(); render();
 </script>
 </body>
