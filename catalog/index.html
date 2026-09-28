@@ -3,58 +3,59 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Product Catalog — Zara Sourcing</title>
+<title>Zara Sourcing — Product Catalog</title>
 <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Inter:wght@400;500;600;700&display=swap">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: "Inter", sans-serif; background: #0E0E0C; color: #EDE8DF; }
-header { padding: 30px 6vw; border-bottom: 1px solid #2A2620; background: #161410; }
-header h1 { color: #C9A961; font-size: 28px; }
+header { padding: 30px 6vw; border-bottom: 1px solid #2A2620; background: #161410; display:flex; justify-content:space-between; align-items:center; }
+.brand { font-size: 26px; font-weight: 700; color: #C9A961; }
+.brand span { color: #EDE8DF; }
 header p { color: #999; margin-top: 6px; font-size: 14px; }
 .toolbar { padding: 20px 6vw; display: flex; gap: 12px; flex-wrap: wrap; position: sticky; top: 0; background: #0E0E0C; z-index: 10; border-bottom: 1px solid #2A2620; }
 .toolbar input { flex: 1; min-width: 200px; padding: 12px 16px; border-radius: 10px; border: 1px solid #333; background: #1C1A16; color: #fff; }
 .toolbar select { padding: 12px; border-radius: 10px; background: #1C1A16; color: #fff; border: 1px solid #333; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; padding: 30px 6vw; }
-.card { background: #161410; border: 1px solid #2A2620; border-radius: 12px; padding: 18px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 18px; padding: 30px 6vw; }
+.card { background: #161410; border: 1px solid #2A2620; border-radius: 14px; overflow: hidden; }
+.card .imgwrap { position: relative; aspect-ratio: 4/3; background: #0E0E0C; overflow: hidden; }
+.card img { width: 100%; height: 100%; object-fit: cover; }
+.card .wm { position: absolute; bottom: 8px; right: 8px; background: rgba(14,14,12,0.8); color: #C9A961; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 1px; }
+.card .body { padding: 14px; }
 .card .cat { font-size: 11px; color: #C9A961; text-transform: uppercase; letter-spacing: 1px; }
-.card h3 { font-size: 15px; margin: 8px 0; }
-.card .price { font-size: 20px; color: #C9A961; font-weight: 700; }
-.card .moq { font-size: 12px; color: #888; margin-top: 6px; }
+.card h3 { font-size: 14px; margin: 6px 0; }
+.price-row { display: flex; justify-content: space-between; align-items: baseline; margin: 8px 0; }
+.tk { font-size: 20px; color: #C9A961; font-weight: 700; }
+.usd { font-size: 12px; color: #888; }
+.moq { font-size: 12px; color: #888; }
 .banner { background: linear-gradient(135deg,#C9A961,#8B6914); color: #0E0E0C; padding: 12px 6vw; font-weight: 600; }
 </style>
 </head>
 <body>
 <header>
-  <h1>Product Catalog</h1>
-  <p>Factory prices, 25% margin included. Shipping to Chittagong/Dhaka quoted separately. MOQ per item.</p>
+  <div>
+    <div class="brand">Zara<span>Sourcing</span></div>
+    <p>Factory prices, 25% margin included. 1 RMB = 20.5 BDT.</p>
+  </div>
 </header>
-<div class="banner">All prices already include 25% commission — no hidden fees.</div>
+<div class="banner">All prices in BDT already include 25% commission. Shipping to Chittagong/Dhaka quoted separately.</div>
 <div class="toolbar">
-  <input id="search" placeholder="Search products... (e.g. earphone, charger, watch)">
+  <input id="search" placeholder="Search products...">
   <select id="catFilter"><option value="">All categories</option></select>
 </div>
 <div class="grid" id="grid"></div>
 
 <script>
-// Catalog: name, category, factory price RMB, MOQ. Sale price = factory * 1.25, shown in USD approx.
 const RAW = [
-// Electronics
-["Wireless Earbuds TWS Pro","Electronics",18,50],["Bluetooth Speaker Mini","Electronics",12,100],["20000mAh Power Bank","Electronics",16,50],["Fast Charger 65W","Electronics",9,100],["USB-C Cable 1m","Electronics",1.2,500],["Phone Case iPhone 15","Electronics",0.8,500],["Tempered Glass Screen","Electronics",0.3,1000],["Smart Watch Series 9","Electronics",22,30],["Selfie Ring Light","Electronics",4,200],["Phone Tripod","Electronics",3.5,200],["Bluetooth Earphones Neckband","Electronics",7,100],["Car Phone Holder","Electronics",1.5,500],["Mini Fan Portable","Electronics",2.8,300],["LED Desk Lamp","Electronics",6,100],["Wireless Mouse","Electronics",3,200],["Mechanical Keyboard","Electronics",18,50],["Webcam 1080p","Electronics",9,100],["HDMI Cable 2m","Electronics",2.5,200],["Smart LED Bulb","Electronics",3,300],["Bluetooth FM Transmitter","Electronics",4,200],
-// Home & Kitchen
-["Stainless Steel Cookware Set","Home",28,30],["Non-stick Frying Pan","Home",6.5,100],["Electric Kettle 1.8L","Home",9,100],["Rice Cooker 1.5L","Home",12,50],["Vacuum Flask 500ml","Home",4,200],["Glass Water Bottle","Home",1.8,300],["Cutlery Set 24pc","Home",5,100],["Food Storage Container Set","Home",3.5,200],["Electric Blender","Home",14,50],["Hand Mixer","Home",5.5,100],["Knife Set 6pc","Home",8,100],["Kitchen Scale Digital","Home",3,200],["Silicone Baking Mat","Home",1.2,500],["Dish Drying Rack","Home",6,100],["LED Night Light","Home",1.5,500],
-// Beauty & Personal
-["Hair Dryer Professional","Beauty",11,50],["Trimmer Men","Beauty",5,100],["Electric Shaver","Beauty",7,100],["Makeup Brush Set","Beauty",2.5,300],["Cosmetic Bag","Beauty",1.8,300],["Hair Straightener","Beauty",8,100],["Facial Steamer","Beauty",10,50],["Nail Clipper Set","Beauty",1.5,500],["Hair Curler","Beauty",9,100],["Massage Gun","Beauty",14,50],
-// Fashion & Accessories
-["Men's Analog Watch","Fashion",6,100],["Women's Leather Bag","Fashion",11,50],["Sunglasses UV400","Fashion",2.5,200],["Wallet Men PU","Fashion",3,200],["Silicone Watch Band","Fashion",0.9,500],["Baseball Cap","Fashion",2,300],["Leather Belt","Fashion",2.8,200],["Silicone Wedding Ring","Fashion",0.5,1000],["Ladies Scarf","Fashion",2.2,300],["Travel Backpack","Fashion",9,100],
-// Toys & Kids
-["Building Blocks 500pc","Toys",7,100],["RC Car Remote Control","Toys",8,100],["Plush Teddy Bear","Toys",3.5,200],["Kids Drawing Board","Toys",2.5,200],["Baby Rattle Set","Toys",1.8,300],["Puzzle 100pc","Toys",2,300],["Water Gun Summer","Toys",1.5,300],["Toy Drone Mini","Toys",12,50],
-// Automotive
-["Car Phone Mount","Auto",1.5,500],["Car Charger Dual USB","Auto",2,300],["Tire Inflator Portable","Auto",11,50],["Car Seat Cover","Auto",14,50],["LED Car Interior Strip","Auto",2.5,200],["Jump Starter Power","Auto",22,30],["Car Wax Polish","Auto",3,200],["Dash Cam 1080p","Auto",16,50],
-// Sports & Outdoor
-["Yoga Mat 6mm","Sports",4,200],["Resistance Bands Set","Sports",2.5,300],["Jump Rope Speed","Sports",1.2,500],["Dumbbell Set Adjustable","Sports",18,30],["Water Bottle 1L","Sports",2,300],["LED Gym Gloves","Sports",2.8,200],["Foam Roller","Sports",3.5,200],["Running Belt Waist","Sports",1.8,300],
+["Wireless Earbuds TWS Pro","Electronics",18,50],["Bluetooth Speaker Mini","Electronics",12,100],["20000mAh Power Bank","Electronics",16,50],["Fast Charger 65W","Electronics",9,100],["USB-C Cable 1m","Electronics",1.2,500],["Phone Case iPhone 15","Electronics",0.8,500],["Tempered Glass Screen","Electronics",0.3,1000],["Smart Watch Series 9","Electronics",22,30],["Selfie Ring Light","Electronics",4,200],["Phone Tripod","Electronics",3.5,200],["Bluetooth Neckband","Electronics",7,100],["Car Phone Holder","Electronics",1.5,500],["Mini Fan Portable","Electronics",2.8,300],["LED Desk Lamp","Electronics",6,100],["Wireless Mouse","Electronics",3,200],["Mechanical Keyboard","Electronics",18,50],["Webcam 1080p","Electronics",9,100],["HDMI Cable 2m","Electronics",2.5,200],["Smart LED Bulb","Electronics",3,300],["FM Transmitter Car","Electronics",4,200],
+["Stainless Cookware Set","Home",28,30],["Non-stick Frying Pan","Home",6.5,100],["Electric Kettle 1.8L","Home",9,100],["Rice Cooker 1.5L","Home",12,50],["Vacuum Flask 500ml","Home",4,200],["Glass Water Bottle","Home",1.8,300],["Cutlery Set 24pc","Home",5,100],["Food Storage Set","Home",3.5,200],["Electric Blender","Home",14,50],["Hand Mixer","Home",5.5,100],["Knife Set 6pc","Home",8,100],["Digital Kitchen Scale","Home",3,200],["Baking Mat Silicone","Home",1.2,500],["Dish Drying Rack","Home",6,100],["LED Night Light","Home",1.5,500],
+["Hair Dryer Professional","Beauty",11,50],["Men's Trimmer","Beauty",5,100],["Electric Shaver","Beauty",7,100],["Makeup Brush Set","Beauty",2.5,300],["Cosmetic Bag","Beauty",1.8,300],["Hair Straightener","Beauty",8,100],["Facial Steamer","Beauty",10,50],["Nail Clipper Set","Beauty",1.5,500],["Hair Curler","Beauty",9,100],["Massage Gun","Beauty",14,50],
+["Men's Analog Watch","Fashion",6,100],["Women's Leather Bag","Fashion",11,50],["Sunglasses UV400","Fashion",2.5,200],["Men's Wallet PU","Fashion",3,200],["Watch Band Silicone","Fashion",0.9,500],["Baseball Cap","Fashion",2,300],["Leather Belt","Fashion",2.8,200],["Wedding Ring Silicone","Fashion",0.5,1000],["Ladies Scarf","Fashion",2.2,300],["Travel Backpack","Fashion",9,100],
+["Building Blocks 500pc","Toys",7,100],["RC Car","Toys",8,100],["Plush Teddy Bear","Toys",3.5,200],["Drawing Board Kids","Toys",2.5,200],["Baby Rattle Set","Toys",1.8,300],["Puzzle 100pc","Toys",2,300],["Water Gun","Toys",1.5,300],["Mini Drone","Toys",12,50],
+["Car Mount","Auto",1.5,500],["Car Charger USB","Auto",2,300],["Tire Inflator","Auto",11,50],["Car Seat Cover","Auto",14,50],["LED Interior Strip","Auto",2.5,200],["Jump Starter","Auto",22,30],["Car Wax Polish","Auto",3,200],["Dash Cam 1080p","Auto",16,50],
+["Yoga Mat 6mm","Sports",4,200],["Resistance Bands Set","Sports",2.5,300],["Jump Rope","Sports",1.2,500],["Dumbbell Set","Sports",18,30],["Water Bottle 1L","Sports",2,300],["Gym Gloves","Sports",2.8,200],["Foam Roller","Sports",3.5,200],["Running Belt","Sports",1.8,300],
 ];
 
-const usd = rmb => (rmb * 0.14).toFixed(2);
+const RATE = 20.5; // 1 RMB = 20.5 BDT
 const grid = document.getElementById('grid');
 const catFilter = document.getElementById('catFilter');
 const cats = [...new Set(RAW.map(p=>p[1]))];
@@ -64,12 +65,23 @@ function render() {
   const q = document.getElementById('search').value.toLowerCase();
   const cat = catFilter.value;
   grid.innerHTML = '';
-  RAW.filter(p => (!cat || p[1]===cat) && (!q || p[0].toLowerCase().includes(q))).forEach(p => {
+  RAW.filter(p => (!cat || p[1]===cat) && (!q || p[0].toLowerCase().includes(q))).forEach((p,i) => {
     const [name, c, rmb, moq] = p;
-    const sell = rmb * 1.25;
+    const sellRmb = rmb * 1.25;
+    const bdt = Math.round(sellRmb * RATE);
+    const usd = (sellRmb * 0.14).toFixed(2);
     const div = document.createElement('div');
     div.className = 'card';
-    div.innerHTML = `<div class="cat">${c}</div><h3>${name}</h3><div class="price">$${usd(sell)}</div><div class="moq">MOQ: ${moq} pcs · factory price $${usd(rmb)}</div>`;
+    div.innerHTML = `<div class="imgwrap">
+      <img src="https://picsum.photos/seed/zara${i}/400/300" alt="${name}">
+      <div class="wm">ZARA SOURCING</div>
+    </div>
+    <div class="body">
+      <div class="cat">${c}</div>
+      <h3>${name}</h3>
+      <div class="price-row"><span class="tk">৳${bdt}</span><span class="usd">$${usd}</span></div>
+      <div class="moq">MOQ: ${moq} pcs</div>
+    </div>`;
     grid.appendChild(div);
   });
 }
